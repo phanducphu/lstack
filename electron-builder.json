@@ -1,0 +1,50 @@
+{
+  "appId": "dev.lstack.app",
+  "productName": "LStack",
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "dist-electron/**/*",
+    "dist/**/*",
+    "package-registry.json"
+  ],
+  "asar": true,
+  "extraResources": [
+    "package-registry.json",
+    { "from": "icon.png", "to": "icon.png" }
+  ],
+  "asarUnpack": [
+    "node_modules/node-pty/**/*"
+  ],
+  "win": {
+    "icon": "icon.png",
+    "target": [
+      "dir"
+    ]
+  },
+  "mac": {
+    "icon": "icon.png",
+    "target": [
+      "dmg",
+      "zip"
+    ],
+    "category": "public.app-category.developer-tools"
+  },
+  "dmg": {
+    "title": "LStack",
+    "icon": "icon.png"
+  },
+  "linux": {
+    "icon": "icon.png",
+    "target": [
+      "deb",
+      "rpm",
+      "AppImage"
+    ],
+    "category": "Development",
+    "maintainer": "LStack <contact@lstack.dev>"
+  },
+  "npmRebuild": false,
+  "buildDependenciesFromSource": false
+}
