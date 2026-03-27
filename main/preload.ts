@@ -67,6 +67,7 @@ const api = {
     create: (name: string, template: string, options?: ProjectCreateOptions): Promise<Project> =>
       ipcRenderer.invoke('project:create', name, template, options),
     open: (dirPath: string) => ipcRenderer.invoke('project:open', dirPath),
+    add: (name: string, dirPath: string) => ipcRenderer.invoke('project:add', name, dirPath),
     delete: (name: string) => ipcRenderer.invoke('project:delete', name),
     onInstallLog: (cb: (data: string) => void) => {
       const handler = (_: Electron.IpcRendererEvent, data: string) => cb(data);

@@ -41,6 +41,7 @@ export const vi = {
   'common.extensions': 'extensions',
   'common.project': 'dự án',
   'common.projects': 'dự án',
+  'common.browse': 'Duyệt',
 
   // ── Projects ───────────────────────────────────────────────────────────────
   'projects.workspace': 'Không gian làm việc',
@@ -64,6 +65,9 @@ export const vi = {
   'projects.noProjectsHint': 'Tạo dự án mới hoặc thay đổi bộ lọc tìm kiếm.',
   'projects.openTerminal': 'Mở terminal',
   'projects.openExplorer': 'Mở thư mục',
+  'projects.addExisting': 'Thêm thư mục có sẵn',
+  'projects.pathLabel': 'Vị trí dự án',
+  'projects.resetPath': 'Khôi phục vị trí mặc định',
   'projects.deleteProject': 'Xóa dự án',
   'projects.deleteConfirm': 'Bạn có chắc muốn xóa dự án "{name}"?',
   'projects.modal.phpConfiguration': 'Cấu hình PHP',

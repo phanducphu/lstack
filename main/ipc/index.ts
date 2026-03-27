@@ -210,62 +210,88 @@ export function registerIpcHandlers(ctx: IpcContext) {
 
   ipcMain.handle('project:list', async () => {
     const wwwDir = settings.wwwDir;
-    if (!await fs.pathExists(wwwDir)) return [];
+    const projects: any[] = [];
+    const processedPaths = new Set<string>();
 
-    const entries = await fs.readdir(wwwDir, { withFileTypes: true });
-    const projects = [];
-
-    // Load vhost data for profile/port info
+    // Load vhost data for profile/port info and extra projects
     const vhostList = await vhostManager.list().catch(() => [] as any[]);
     const vhostMap = new Map(vhostList.map((v: any) => [v.name, v]));
 
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-      const dirPath = path.join(wwwDir, entry.name);
+    // 1. Scan default wwwDir
+    if (await fs.pathExists(wwwDir)) {
+      const entries = await fs.readdir(wwwDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (!entry.isDirectory()) continue;
+        const dirPath = path.join(wwwDir, entry.name);
+        processedPaths.add(dirPath);
 
-      const hasGit = await fs.pathExists(path.join(dirPath, '.git'));
-      const hasComposer = await fs.pathExists(path.join(dirPath, 'composer.json'));
-      const hasPackageJson = await fs.pathExists(path.join(dirPath, 'package.json'));
+        const project = await analyzeProjectDir(entry.name, dirPath, settings, vhostMap);
+        projects.push(project);
+      }
+    }
 
-      let framework: string | undefined;
-      if (await fs.pathExists(path.join(dirPath, 'artisan'))) {
-        framework = 'laravel';
-      } else if (
-        await fs.pathExists(path.join(dirPath, 'wp-config.php')) ||
-        await fs.pathExists(path.join(dirPath, 'wp-login.php'))
-      ) {
-        framework = 'wordpress';
-      } else if (await fs.pathExists(path.join(dirPath, 'symfony.lock'))) {
-        framework = 'symfony';
-      } else if (await fs.pathExists(path.join(dirPath, 'spark'))) {
-        framework = 'codeigniter';
-      } else if (await fs.pathExists(path.join(dirPath, 'core/lib/Drupal.php'))) {
-        framework = 'drupal';
-      } else if (
-        await fs.pathExists(path.join(dirPath, 'administrator/index.php')) &&
-        await fs.pathExists(path.join(dirPath, 'libraries/src/Version.php'))
-      ) {
-        framework = 'joomla';
-      } else if (
-        await fs.pathExists(path.join(dirPath, 'config/defines.inc.php')) ||
-        await fs.pathExists(path.join(dirPath, 'app/config/parameters.php'))
-      ) {
-        framework = 'prestashop';
+    // 2. Include external vhosts not in wwwDir
+    for (const vhost of vhostList) {
+      if (!vhost.projectDir) continue;
+      // Resolve document root to project root if possible (vhost.projectDir often points to /public)
+      let projectRoot = vhost.projectDir;
+      if (vhost.projectDir.endsWith(`${path.sep}public`) || vhost.projectDir.endsWith('/public')) {
+        projectRoot = path.dirname(vhost.projectDir);
       }
 
-      projects.push({
-        name: entry.name,
-        path: dirPath,
-        hostname: `${entry.name}.${settings.domain}`,
-        hasGit,
-        hasComposer,
-        hasPackageJson,
-        framework,
-        vhost: vhostMap.get(entry.name) ?? undefined,
-      });
+      if (processedPaths.has(projectRoot)) continue;
+      if (!await fs.pathExists(projectRoot)) continue;
+
+      const project = await analyzeProjectDir(vhost.name, projectRoot, settings, vhostMap);
+      projects.push(project);
+      processedPaths.add(projectRoot);
     }
+
     return projects;
   });
+
+  const analyzeProjectDir = async (name: string, dirPath: string, settings: any, vhostMap: Map<string, any>) => {
+    const hasGit = await fs.pathExists(path.join(dirPath, '.git'));
+    const hasComposer = await fs.pathExists(path.join(dirPath, 'composer.json'));
+    const hasPackageJson = await fs.pathExists(path.join(dirPath, 'package.json'));
+
+    let framework: string | undefined;
+    if (await fs.pathExists(path.join(dirPath, 'artisan'))) {
+      framework = 'laravel';
+    } else if (
+      await fs.pathExists(path.join(dirPath, 'wp-config.php')) ||
+      await fs.pathExists(path.join(dirPath, 'wp-login.php'))
+    ) {
+      framework = 'wordpress';
+    } else if (await fs.pathExists(path.join(dirPath, 'symfony.lock'))) {
+      framework = 'symfony';
+    } else if (await fs.pathExists(path.join(dirPath, 'spark'))) {
+      framework = 'codeigniter';
+    } else if (await fs.pathExists(path.join(dirPath, 'core/lib/Drupal.php'))) {
+      framework = 'drupal';
+    } else if (
+      await fs.pathExists(path.join(dirPath, 'administrator/index.php')) &&
+      await fs.pathExists(path.join(dirPath, 'libraries/src/Version.php'))
+    ) {
+      framework = 'joomla';
+    } else if (
+      await fs.pathExists(path.join(dirPath, 'config/defines.inc.php')) ||
+      await fs.pathExists(path.join(dirPath, 'app/config/parameters.php'))
+    ) {
+      framework = 'prestashop';
+    }
+
+    return {
+      name,
+      path: dirPath,
+      hostname: `${name}.${settings.domain}`,
+      hasGit,
+      hasComposer,
+      hasPackageJson,
+      framework,
+      vhost: vhostMap.get(name) ?? undefined,
+    };
+  };
 
   // ─── Project create helpers ───────────────────────────────────────────────
 
@@ -351,8 +377,9 @@ export function registerIpcHandlers(ctx: IpcContext) {
       phpProfileId?: string;
       autoInstallPhp?: boolean;
       skipPhpInstallPrompt?: boolean;
+      projectPath?: string;
     }) => {
-      const projectDir = path.join(settings.wwwDir, name);
+      const projectDir = path.join(opts?.projectPath || settings.wwwDir, name);
       const fwVersion = opts?.frameworkVersion;
       const phpVer = opts?.phpVersion || getPhpVersionForFramework(template, fwVersion);
       const profileId = isFrameworkRequiringPhp(template)
@@ -400,7 +427,10 @@ export function registerIpcHandlers(ctx: IpcContext) {
 
         if (template === 'blank') {
           await fs.ensureDir(projectDir);
-          await fs.writeFile(path.join(projectDir, 'index.php'), blankTemplate(name));
+          const existingFiles = await fs.readdir(projectDir);
+          if (existingFiles.length === 0) {
+            await fs.writeFile(path.join(projectDir, 'index.php'), blankTemplate(name));
+          }
 
         } else if (template === 'wordpress') {
           const tmpFile = path.join(settings.dataDir, '.tmp', 'wordpress-latest.zip');
@@ -559,9 +589,28 @@ export function registerIpcHandlers(ctx: IpcContext) {
     await shell.openPath(dirPath);
   });
 
+  ipcMain.handle('project:add', async (_, name: string, dirPath: string) => {
+    if (!await fs.pathExists(dirPath)) throw new Error('Directory does not exist');
+    await vhostManager.add(name, dirPath);
+  });
+
   ipcMain.handle('project:delete', async (_, name: string) => {
-    const projectDir = path.join(settings.wwwDir, name);
-    await fs.remove(projectDir);
+    // Determine path from vhost data
+    const vhostList = await vhostManager.list().catch(() => []);
+    const vhost = vhostList.find((v: any) => v.name === name);
+
+    let projectPath = vhost?.projectDir || path.join(settings.wwwDir, name);
+    // If it's a docroot (/public), get the parent
+    if (projectPath.endsWith(`${path.sep}public`) || projectPath.endsWith('/public')) {
+      projectPath = path.dirname(projectPath);
+    }
+
+    const isInsideWww = projectPath.startsWith(settings.wwwDir) || projectPath.includes(path.join('.lstack', 'www'));
+
+    if (isInsideWww) {
+      await fs.remove(projectPath).catch(() => {});
+    }
+
     await vhostManager.remove(name);
   });
 

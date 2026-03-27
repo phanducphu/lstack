@@ -17,6 +17,10 @@ import { useTranslation } from '../i18n';
 import { InstallTerminal } from '../components/InstallTerminal';
 import type { Project, PhpProfile, VHostPhpSettings } from '../types';
 
+const pathJoin = (...parts: string[]) => {
+  return parts.join('/').replace(/\/+/g, '/');
+};
+
 const TEMPLATES = [
   { 
     id: 'blank',
@@ -113,6 +117,7 @@ export function Projects() {
   const [creating, setCreating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [customPath, setCustomPath] = useState<string | null>(null);
   
   const { clearLogs } = useServiceStore();
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
@@ -154,11 +159,13 @@ export function Projects() {
     try {
       await window.lstack.project.create(newName.trim(), newTemplate, {
         frameworkVersion: newFrameworkVersion || undefined,
+        projectPath: customPath || undefined,
       });
       addToast({ type: 'success', message: t('projects.create.success', { name: newName.trim() }) });
       setNewName('');
       setNewTemplate('blank');
       setNewFrameworkVersion('');
+      setCustomPath(null);
       setShowCreate(false);
       await loadProjects();
     } catch (err: any) {
@@ -166,6 +173,11 @@ export function Projects() {
     } finally {
       setCreating(false);
     }
+  };
+
+  const handleSelectCustomPath = async () => {
+    const path = await window.lstack.system.selectDir();
+    if (path) setCustomPath(path);
   };
 
   const handleDelete = async (name: string) => {
@@ -303,7 +315,7 @@ export function Projects() {
             )}
 
             <button
-              onClick={() => setShowCreate(!showCreate)}
+              onClick={() => { setShowCreate(!showCreate); setCustomPath(null); }}
               className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-full transition-all shadow-lg shadow-blue-500/20 active:scale-95 whitespace-nowrap shrink-0"
             >
               <Plus className="w-4 h-4 shrink-0" />
@@ -340,6 +352,33 @@ export function Projects() {
                     <span className="text-blue-400/80 font-mono bg-blue-500/10 px-2 py-0.5 rounded">
                       {newName || 'project'}.{settings?.domain || 'test'}
                     </span>
+                  </div>
+
+                  <div className="pt-4 mt-4 border-t border-slate-700/50">
+                    <label className="text-sm font-medium text-slate-400 block mb-2">{t('projects.pathLabel', { defaultValue: 'Project Location' })}</label>
+                    <div className="flex gap-2">
+                       <input
+                        type="text"
+                        readOnly
+                        value={pathJoin(customPath || settings?.wwwDir || '', newName)}
+                        className="flex-1 bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-2 text-slate-400 text-xs font-mono overflow-hidden text-ellipsis whitespace-nowrap"
+                      />
+                      <button 
+                        onClick={handleSelectCustomPath}
+                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium rounded-xl transition-all flex items-center gap-2 shrink-0"
+                      >
+                        <FolderOpen className="w-3.5 h-3.5" />
+                        {t('common.browse', { defaultValue: 'Browse' })}
+                      </button>
+                    </div>
+                    {customPath && (
+                      <button 
+                        onClick={() => setCustomPath(null)}
+                        className="mt-2 text-[10px] text-blue-400 hover:text-blue-300 underline underline-offset-2"
+                      >
+                        {t('projects.resetPath', { defaultValue: 'Reset to default location' })}
+                      </button>
+                    )}
                   </div>
                 </div>
 

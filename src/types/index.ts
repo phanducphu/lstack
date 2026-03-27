@@ -112,7 +112,7 @@ export interface Project {
   hasGit: boolean;
   hasComposer: boolean;
   hasPackageJson: boolean;
-  framework?: 'laravel' | 'wordpress' | 'symfony' | 'codeigniter' | 'generic';
+  framework?: 'laravel' | 'wordpress' | 'symfony' | 'codeigniter' | 'drupal' | 'joomla' | 'prestashop' | 'generic';
 }
 
 export interface ProjectCreateOptions {
@@ -121,6 +121,7 @@ export interface ProjectCreateOptions {
   phpProfileId?: string;
   autoInstallPhp?: boolean;
   skipPhpInstallPrompt?: boolean;
+  projectPath?: string;
 }
 
 export type AppLanguage = 'vi' | 'en';

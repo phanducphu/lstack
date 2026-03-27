@@ -43,6 +43,7 @@ export const en: Record<TranslationKey, string> = {
   'common.extensions': 'extensions',
   'common.project': 'project',
   'common.projects': 'projects',
+  'common.browse': 'Browse',
 
   // ── Projects ───────────────────────────────────────────────────────────────
   'projects.workspace': 'Workspace',
@@ -66,6 +67,9 @@ export const en: Record<TranslationKey, string> = {
   'projects.noProjectsHint': 'Create a new project or change the search filter.',
   'projects.openTerminal': 'Open terminal',
   'projects.openExplorer': 'Open folder',
+  'projects.addExisting': 'Add existing folder',
+  'projects.pathLabel': 'Project location',
+  'projects.resetPath': 'Reset to default location',
   'projects.deleteProject': 'Delete project',
   'projects.deleteConfirm': 'Are you sure you want to delete project "{name}"?',
   'projects.modal.phpConfiguration': 'PHP Configuration',
