@@ -59,7 +59,7 @@ export function ServiceCard({ service, onStart, onStop, onRestart, onSwitchVersi
     <div
       onContextMenu={(e) => {
         e.preventDefault();
-        window.lstack.service.showContextMenu(service.name);
+        window.avnstack.service.showContextMenu(service.name);
       }}
       className={`bg-slate-800 border rounded-xl p-4 transition-all ${
         notInstalled
@@ -185,7 +185,7 @@ export function ServiceCard({ service, onStart, onStop, onRestart, onSwitchVersi
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                window.lstack.service.showContextMenu(name);
+                window.avnstack.service.showContextMenu(name);
               }}
               title={t('sidebar.configureService', { service: label })}
               className="px-3 py-1.5 bg-slate-700 hover:bg-blue-600 text-slate-300 hover:text-white rounded-lg transition-colors flex justify-center items-center"

@@ -20,12 +20,12 @@ import type { PackageManager } from '../core/PackageManager';
 import type { VHostManager } from '../core/VHostManager';
 import type { CertManager } from '../core/CertManager';
 import type { TerminalManager } from '../core/TerminalManager';
-import type { LStackSettings, ServiceName } from '../../src/types';
+import type { AVNStackSettings, ServiceName } from '../../src/types';
 
 interface IpcContext {
   ipcMain: IpcMain;
-  settings: LStackSettings;
-  saveSettings: (s: LStackSettings) => Promise<void>;
+  settings: AVNStackSettings;
+  saveSettings: (s: AVNStackSettings) => Promise<void>;
   serviceManager: ServiceManager;
   packageManager: PackageManager;
   vhostManager: VHostManager;
@@ -396,164 +396,177 @@ export function registerIpcHandlers(ctx: IpcContext) {
         ctx.mainWindow()?.webContents.send('project:create:raw', data.toString());
       };
 
+      const exists = await fs.pathExists(projectDir);
+      const isNotEmpty = exists && (await fs.readdir(projectDir)).length > 0;
+      const skipScaffold = isNotEmpty;
+
       try {
-        // Auto-install PHP if needed
-        const installedPhpVersions = (await packageManager.getInstalledVersions()).php || [];
-        if (phpVer && isFrameworkRequiringPhp(template) && !installedPhpVersions.includes(phpVer)) {
-          let doInstall = opts?.autoInstallPhp === true;
-          if (!doInstall && !opts?.skipPhpInstallPrompt) {
-            const fwLabel = fwVersion ? `${template} ${fwVersion}` : template;
-            const win = ctx.mainWindow();
-            const msgOpts = {
-              type: 'question' as const,
-              buttons: ['Cài PHP', 'Hủy'],
-              defaultId: 0,
-              cancelId: 1,
-              noLink: true,
-              title: 'Thiếu phiên bản PHP phù hợp',
-              message: `Project ${fwLabel} cần PHP ${phpVer}.`,
-              detail: `Hiện hệ thống chưa có PHP ${phpVer}. Bạn có muốn cài ngay để tiếp tục tạo project không?`,
+        if (!skipScaffold) {
+          // Auto-install PHP if needed
+          const installedPhpVersions = (await packageManager.getInstalledVersions()).php || [];
+          if (phpVer && isFrameworkRequiringPhp(template) && !installedPhpVersions.includes(phpVer)) {
+            let doInstall = opts?.autoInstallPhp === true;
+            if (!doInstall && !opts?.skipPhpInstallPrompt) {
+              const fwLabel = fwVersion ? `${template} ${fwVersion}` : template;
+              const win = ctx.mainWindow();
+              const msgOpts = {
+                type: 'question' as const,
+                buttons: ['Cài PHP', 'Hủy'],
+                defaultId: 0,
+                cancelId: 1,
+                noLink: true,
+                title: 'Thiếu phiên bản PHP phù hợp',
+                message: `Project ${fwLabel} cần PHP ${phpVer}.`,
+                detail: `Hiện hệ thống chưa có PHP ${phpVer}. Bạn có muốn cài ngay để tiếp tục tạo project không?`,
+              };
+              const result = win
+                ? await dialog.showMessageBox(win, msgOpts)
+                : await dialog.showMessageBox(msgOpts);
+              doInstall = result.response === 0;
+            }
+            if (!doInstall) throw new Error(`Đã hủy vì chưa cài PHP ${phpVer}.`);
+            log(`Đang cài PHP ${phpVer} theo yêu cầu của ${template} ${fwVersion || ''}...`);
+            rawLog(`\x1b[36mĐang cài PHP ${phpVer}...\x1b[0m\r\n`);
+            await packageManager.install('php', phpVer);
+          }
+
+          if (template === 'blank') {
+            await fs.ensureDir(projectDir);
+            const existingFiles = await fs.readdir(projectDir);
+            if (existingFiles.length === 0) {
+              await fs.writeFile(path.join(projectDir, 'index.php'), blankTemplate(name));
+            }
+
+          } else if (template === 'wordpress') {
+            const tmpFile = path.join(settings.dataDir, '.tmp', 'wordpress-latest.zip');
+            const tmpExtract = path.join(settings.dataDir, '.tmp', 'wp-extract');
+            await fs.ensureDir(path.dirname(tmpFile));
+            log('Đang tải WordPress từ wordpress.org...');
+            rawLog('\x1b[36mĐang tải WordPress từ wordpress.org...\x1b[0m\r\n');
+            const wpTag = fwVersion && fwVersion !== 'latest' ? fwVersion : 'latest';
+            const wpUrl = wpTag === 'latest'
+              ? 'https://wordpress.org/latest.zip'
+              : `https://wordpress.org/wordpress-${wpTag}.zip`;
+            await downloadFile(wpUrl, tmpFile, log, rawLog);
+            log('Đang giải nén WordPress...');
+            rawLog('\x1b[36mĐang giải nén WordPress...\x1b[0m\r\n');
+            await fs.ensureDir(tmpExtract);
+            await extractZip(tmpFile, { dir: tmpExtract });
+            const wpSrc = path.join(tmpExtract, 'wordpress');
+            if (await fs.pathExists(wpSrc)) {
+              await fs.move(wpSrc, projectDir, { overwrite: true });
+            } else {
+              await fs.move(tmpExtract, projectDir, { overwrite: true });
+            }
+            await fs.remove(tmpFile).catch(() => {});
+            await fs.remove(tmpExtract).catch(() => {});
+            log('WordPress đã được cài đặt thành công!');
+            rawLog('\x1b[32m✔ WordPress đã được cài đặt thành công!\x1b[0m\r\n');
+
+          } else if (['drupal', 'joomla', 'prestashop'].includes(template)) {
+            const downloadConfigs: Record<string, { url: string; extractDir?: string }> = {
+              drupal: {
+                url: 'https://ftp.drupal.org/files/projects/drupal-11.0.0.zip',
+                extractDir: 'drupal-11.0.0',
+              },
+              joomla: {
+                url: 'https://downloads.joomla.org/cms/joomla5/5-2-2/Joomla_5-2-2-Stable-Full_Package.zip',
+              },
+              prestashop: {
+                url: 'https://github.com/PrestaShop/PrestaShop/releases/download/8.1.7/prestashop_8.1.7.zip',
+              },
             };
-            const result = win
-              ? await dialog.showMessageBox(win, msgOpts)
-              : await dialog.showMessageBox(msgOpts);
-            doInstall = result.response === 0;
-          }
-          if (!doInstall) throw new Error(`Đã hủy vì chưa cài PHP ${phpVer}.`);
-          log(`Đang cài PHP ${phpVer} theo yêu cầu của ${template} ${fwVersion || ''}...`);
-          rawLog(`\x1b[36mĐang cài PHP ${phpVer}...\x1b[0m\r\n`);
-          await packageManager.install('php', phpVer);
-        }
+            const { url, extractDir } = downloadConfigs[template];
+            const tmpFile = path.join(settings.dataDir, '.tmp', `${template}-latest.zip`);
+            const tmpExtract = path.join(settings.dataDir, '.tmp', `${template}-extract`);
+            await fs.ensureDir(path.dirname(tmpFile));
+            log(`Đang tải ${template} từ ${url}...`);
+            rawLog(`\x1b[36mĐang tải ${template}...\x1b[0m\r\n`);
+            await downloadFile(url, tmpFile, log, rawLog);
+            log(`Đang giải nén ${template}...`);
+            rawLog(`\x1b[36mĐang giải nén ${template}...\x1b[0m\r\n`);
+            await fs.ensureDir(tmpExtract);
+            await extractZip(tmpFile, { dir: tmpExtract });
+            const src = extractDir ? path.join(tmpExtract, extractDir) : tmpExtract;
+            if (await fs.pathExists(src)) {
+              await fs.move(src, projectDir, { overwrite: true });
+            } else {
+              await fs.move(tmpExtract, projectDir, { overwrite: true });
+            }
+            await fs.remove(tmpFile).catch(() => {});
+            await fs.remove(tmpExtract).catch(() => {});
+            log(`${template} đã được cài đặt thành công!`);
+            rawLog(`\x1b[32m✔ ${template} đã được cài đặt thành công!\x1b[0m\r\n`);
 
-        if (template === 'blank') {
-          await fs.ensureDir(projectDir);
-          const existingFiles = await fs.readdir(projectDir);
-          if (existingFiles.length === 0) {
-            await fs.writeFile(path.join(projectDir, 'index.php'), blankTemplate(name));
-          }
+          } else if (['laravel', 'symfony', 'codeigniter'].includes(template)) {
+            await fs.ensureDir(projectDir);
 
-        } else if (template === 'wordpress') {
-          const tmpFile = path.join(settings.dataDir, '.tmp', 'wordpress-latest.zip');
-          const tmpExtract = path.join(settings.dataDir, '.tmp', 'wp-extract');
-          await fs.ensureDir(path.dirname(tmpFile));
-          log('Đang tải WordPress từ wordpress.org...');
-          rawLog('\x1b[36mĐang tải WordPress từ wordpress.org...\x1b[0m\r\n');
-          const wpTag = fwVersion && fwVersion !== 'latest' ? fwVersion : 'latest';
-          const wpUrl = wpTag === 'latest'
-            ? 'https://wordpress.org/latest.zip'
-            : `https://wordpress.org/wordpress-${wpTag}.zip`;
-          await downloadFile(wpUrl, tmpFile, log, rawLog);
-          log('Đang giải nén WordPress...');
-          rawLog('\x1b[36mĐang giải nén WordPress...\x1b[0m\r\n');
-          await fs.ensureDir(tmpExtract);
-          await extractZip(tmpFile, { dir: tmpExtract });
-          const wpSrc = path.join(tmpExtract, 'wordpress');
-          if (await fs.pathExists(wpSrc)) {
-            await fs.move(wpSrc, projectDir, { overwrite: true });
+            const pkgMap: Record<string, string> = {
+              laravel: 'laravel/laravel',
+              symfony: 'symfony/skeleton',
+              codeigniter: 'codeigniter4/appstarter',
+            };
+
+            log(`Đang tạo project ${template} bằng Composer...`);
+            rawLog(`\x1b[36mĐang tạo project ${template} bằng Composer...\x1b[0m\r\n`);
+
+            const composerArgs: string[] = ['create-project'];
+
+            if (template === 'laravel' && fwVersion) {
+              composerArgs.push(pkgMap[template], '.', `^${fwVersion}.0`, '--prefer-dist', '--no-interaction');
+            } else if (template === 'symfony' && fwVersion) {
+              composerArgs.push(`${pkgMap[template]}:${fwVersion}.*`, '.', '--prefer-dist', '--no-interaction');
+            } else if (template === 'codeigniter' && fwVersion === '3.1') {
+              // CodeIgniter 3 — download zip instead of composer
+              await downloadFile(
+                'https://github.com/bcit-ci/CodeIgniter/archive/refs/tags/3.1.13.zip',
+                path.join(settings.dataDir, '.tmp', 'codeigniter-3.zip'),
+                log, rawLog,
+              );
+              await fs.ensureDir(path.join(settings.dataDir, '.tmp', 'codeigniter-3-extract'));
+              await extractZip(
+                path.join(settings.dataDir, '.tmp', 'codeigniter-3.zip'),
+                { dir: path.join(settings.dataDir, '.tmp', 'codeigniter-3-extract') },
+              );
+              const ci3Src = path.join(settings.dataDir, '.tmp', 'codeigniter-3-extract', 'CodeIgniter-3.1.13');
+              await fs.move(ci3Src, projectDir, { overwrite: true });
+              await fs.remove(path.join(settings.dataDir, '.tmp', 'codeigniter-3.zip')).catch(() => {});
+              await fs.remove(path.join(settings.dataDir, '.tmp', 'codeigniter-3-extract')).catch(() => {});
+              log(`${template} project đã được tạo thành công!`);
+              rawLog(`\x1b[32m✔ ${template} project đã được tạo thành công!\x1b[0m\r\n`);
+            } else if (template === 'codeigniter' && fwVersion) {
+              composerArgs.push(`${pkgMap[template]}:${fwVersion}.*`, '.', '--prefer-dist', '--no-interaction');
+            } else {
+              composerArgs.push(pkgMap[template], '.', '--prefer-dist', '--no-interaction');
+            }
+
+            // Only run composer if NOT CI3 zip method
+            if (!(template === 'codeigniter' && fwVersion === '3.1')) {
+              await runComposer(composerArgs, projectDir, log, {
+                binDir: settings.binDir,
+                phpVersion: phpVer,
+              }, rawLog);
+              log(`${template} project đã được tạo thành công!`);
+              rawLog(`\x1b[32m✔ ${template} project đã được tạo thành công!\x1b[0m\r\n`);
+            }
           } else {
-            await fs.move(tmpExtract, projectDir, { overwrite: true });
-          }
-          await fs.remove(tmpFile).catch(() => {});
-          await fs.remove(tmpExtract).catch(() => {});
-          log('WordPress đã được cài đặt thành công!');
-          rawLog('\x1b[32m✔ WordPress đã được cài đặt thành công!\x1b[0m\r\n');
-
-        } else if (['drupal', 'joomla', 'prestashop'].includes(template)) {
-          const downloadConfigs: Record<string, { url: string; extractDir?: string }> = {
-            drupal: {
-              url: 'https://ftp.drupal.org/files/projects/drupal-11.0.0.zip',
-              extractDir: 'drupal-11.0.0',
-            },
-            joomla: {
-              url: 'https://downloads.joomla.org/cms/joomla5/5-2-2/Joomla_5-2-2-Stable-Full_Package.zip',
-            },
-            prestashop: {
-              url: 'https://github.com/PrestaShop/PrestaShop/releases/download/8.1.7/prestashop_8.1.7.zip',
-            },
-          };
-          const { url, extractDir } = downloadConfigs[template];
-          const tmpFile = path.join(settings.dataDir, '.tmp', `${template}-latest.zip`);
-          const tmpExtract = path.join(settings.dataDir, '.tmp', `${template}-extract`);
-          await fs.ensureDir(path.dirname(tmpFile));
-          log(`Đang tải ${template} từ ${url}...`);
-          rawLog(`\x1b[36mĐang tải ${template}...\x1b[0m\r\n`);
-          await downloadFile(url, tmpFile, log, rawLog);
-          log(`Đang giải nén ${template}...`);
-          rawLog(`\x1b[36mĐang giải nén ${template}...\x1b[0m\r\n`);
-          await fs.ensureDir(tmpExtract);
-          await extractZip(tmpFile, { dir: tmpExtract });
-          const src = extractDir ? path.join(tmpExtract, extractDir) : tmpExtract;
-          if (await fs.pathExists(src)) {
-            await fs.move(src, projectDir, { overwrite: true });
-          } else {
-            await fs.move(tmpExtract, projectDir, { overwrite: true });
-          }
-          await fs.remove(tmpFile).catch(() => {});
-          await fs.remove(tmpExtract).catch(() => {});
-          log(`${template} đã được cài đặt thành công!`);
-          rawLog(`\x1b[32m✔ ${template} đã được cài đặt thành công!\x1b[0m\r\n`);
-
-        } else if (['laravel', 'symfony', 'codeigniter'].includes(template)) {
-          await fs.ensureDir(projectDir);
-
-          const pkgMap: Record<string, string> = {
-            laravel: 'laravel/laravel',
-            symfony: 'symfony/skeleton',
-            codeigniter: 'codeigniter4/appstarter',
-          };
-
-          log(`Đang tạo project ${template} bằng Composer...`);
-          rawLog(`\x1b[36mĐang tạo project ${template} bằng Composer...\x1b[0m\r\n`);
-
-          const composerArgs: string[] = ['create-project'];
-
-          if (template === 'laravel' && fwVersion) {
-            composerArgs.push(pkgMap[template], '.', `^${fwVersion}.0`, '--prefer-dist', '--no-interaction');
-          } else if (template === 'symfony' && fwVersion) {
-            composerArgs.push(`${pkgMap[template]}:${fwVersion}.*`, '.', '--prefer-dist', '--no-interaction');
-          } else if (template === 'codeigniter' && fwVersion === '3.1') {
-            // CodeIgniter 3 — download zip instead of composer
-            await downloadFile(
-              'https://github.com/bcit-ci/CodeIgniter/archive/refs/tags/3.1.13.zip',
-              path.join(settings.dataDir, '.tmp', 'codeigniter-3.zip'),
-              log, rawLog,
-            );
-            await fs.ensureDir(path.join(settings.dataDir, '.tmp', 'codeigniter-3-extract'));
-            await extractZip(
-              path.join(settings.dataDir, '.tmp', 'codeigniter-3.zip'),
-              { dir: path.join(settings.dataDir, '.tmp', 'codeigniter-3-extract') },
-            );
-            const ci3Src = path.join(settings.dataDir, '.tmp', 'codeigniter-3-extract', 'CodeIgniter-3.1.13');
-            await fs.move(ci3Src, projectDir, { overwrite: true });
-            await fs.remove(path.join(settings.dataDir, '.tmp', 'codeigniter-3.zip')).catch(() => {});
-            await fs.remove(path.join(settings.dataDir, '.tmp', 'codeigniter-3-extract')).catch(() => {});
-            log(`${template} project đã được tạo thành công!`);
-            rawLog(`\x1b[32m✔ ${template} project đã được tạo thành công!\x1b[0m\r\n`);
-          } else if (template === 'codeigniter' && fwVersion) {
-            composerArgs.push(`${pkgMap[template]}:${fwVersion}.*`, '.', '--prefer-dist', '--no-interaction');
-          } else {
-            composerArgs.push(pkgMap[template], '.', '--prefer-dist', '--no-interaction');
-          }
-
-          // Only run composer if NOT CI3 zip method
-          if (!(template === 'codeigniter' && fwVersion === '3.1')) {
-            await runComposer(composerArgs, projectDir, log, {
-              binDir: settings.binDir,
-              phpVersion: phpVer,
-            }, rawLog);
-            log(`${template} project đã được tạo thành công!`);
-            rawLog(`\x1b[32m✔ ${template} project đã được tạo thành công!\x1b[0m\r\n`);
+            await fs.ensureDir(projectDir);
           }
         } else {
-          await fs.ensureDir(projectDir);
+          log(`Phát hiện code có sẵn trong ${name} — bỏ qua scaffolding.`);
+          rawLog(`\x1b[36mPhát hiện code có sẵn trong ${name}... bỏ qua scaffolding.\x1b[0m\r\n`);
         }
       } catch (err: unknown) {
-        await fs.remove(projectDir).catch(() => {});
+        // Only remove the directory if we created it (it was empty or non-existent)
+        if (!skipScaffold) {
+          await fs.remove(projectDir).catch(() => {});
+        }
         throw err;
       }
 
       // Auto-create database + write config file for frameworks that need DB
-      if (isFrameworkRequiringDb(template)) {
+      // Skip for existing projects to avoid overwriting production/existing local env
+      if (!skipScaffold && isFrameworkRequiringDb(template)) {
         const dbName = name.replace(/[^a-zA-Z0-9_]/g, '_');
         try {
           await createDatabase(dbName, settings, serviceManager, log, rawLog);
@@ -605,7 +618,7 @@ export function registerIpcHandlers(ctx: IpcContext) {
       projectPath = path.dirname(projectPath);
     }
 
-    const isInsideWww = projectPath.startsWith(settings.wwwDir) || projectPath.includes(path.join('.lstack', 'www'));
+    const isInsideWww = projectPath.startsWith(settings.wwwDir) || projectPath.includes(path.join('.avnstack', 'www'));
 
     if (isInsideWww) {
       await fs.remove(projectPath).catch(() => {});
@@ -666,16 +679,16 @@ export function registerIpcHandlers(ctx: IpcContext) {
 
   ipcMain.handle('settings:get', async () => settings);
 
-  ipcMain.handle('settings:set', async (_, patch: Partial<LStackSettings>) => {
+  ipcMain.handle('settings:set', async (_, patch: Partial<AVNStackSettings>) => {
     const oldWebserver = settings.webserver;
     const oldDomain = settings.domain;
     const backup = { ...settings };
 
-    const merged: LStackSettings = { ...settings, ...patch };
+    const merged: AVNStackSettings = { ...settings, ...patch };
     const webserverChanged = patch.webserver !== undefined && patch.webserver !== oldWebserver;
     const domainChanged = patch.domain !== undefined && patch.domain !== oldDomain;
 
-    const regenerateNginxConf = async (s: LStackSettings) => {
+    const regenerateNginxConf = async (s: AVNStackSettings) => {
       let pmaDir: string = s.wwwDir;
       for (const ver of ['6.0-snapshot', '5.2.3', '5.2.2']) {
         const candidate = packageManager.getInstallPath('phpmyadmin', ver);
@@ -749,8 +762,8 @@ export function registerIpcHandlers(ctx: IpcContext) {
     name: app.getName(),
     version: app.getVersion(),
     owner: 'marixdev',
-    homepage: 'https://lstack.dev',
-    repositoryUrl: 'https://github.com/marixdev/lstack',
+    homepage: 'https://avn.io.vn',
+    repositoryUrl: '',
   }));
 
   ipcMain.handle('system:selectDir', async () => {
@@ -836,7 +849,7 @@ async function downloadFile(
     responseType: 'stream',
     timeout: 600_000,
     maxRedirects: 10,
-    headers: { 'User-Agent': 'Mozilla/5.0 LStack/0.1.0', Accept: '*/*' },
+    headers: { 'User-Agent': 'Mozilla/5.0 AVN-Stack/0.1.0', Accept: '*/*' },
   });
 
   const total = parseInt(response.headers['content-length'] ?? '0', 10);
@@ -888,7 +901,7 @@ async function runComposer(
   });
 
   if (hasSystemComposer) {
-    if (rawLog) rawLog(`\x1b[32m[LStack] Sử dụng system composer\x1b[0m\r\n`);
+    if (rawLog) rawLog(`\x1b[32m[AVN-Stack] Sử dụng system composer\x1b[0m\r\n`);
     await spawnComposer(isWin ? 'composer.bat' : 'composer', args, cwd, log, isWin, rawLog);
     return;
   }
@@ -898,11 +911,11 @@ async function runComposer(
   const composerPhar = path.join(composerDir, 'composer.phar');
 
   if (!await fs.pathExists(composerPhar)) {
-    if (rawLog) rawLog(`\x1b[33m[LStack] Không tìm thấy Composer. Đang tải Composer tự động...\x1b[0m\r\n`);
+    if (rawLog) rawLog(`\x1b[33m[AVN-Stack] Không tìm thấy Composer. Đang tải Composer tự động...\x1b[0m\r\n`);
     log('Không tìm thấy Composer. Đang tải Composer tự động...');
     await fs.ensureDir(composerDir);
     await downloadFile('https://getcomposer.org/composer.phar', composerPhar, log, rawLog);
-    if (rawLog) rawLog(`\x1b[32m[LStack] Composer đã được tải về thành công.\x1b[0m\r\n`);
+    if (rawLog) rawLog(`\x1b[32m[AVN-Stack] Composer đã được tải về thành công.\x1b[0m\r\n`);
     log('Composer đã được tải về thành công.');
   }
 
@@ -910,16 +923,16 @@ async function runComposer(
   const phpExe = await findPhpBinary(opts.binDir, opts.phpVersion);
   if (!phpExe) {
     throw new Error(
-      'Không tìm thấy PHP. Vui lòng cài đặt PHP trong LStack trước khi tạo project này.',
+      'Không tìm thấy PHP. Vui lòng cài đặt PHP trong AVN-Stack trước khi tạo project này.',
     );
   }
   log(`Sử dụng PHP: ${phpExe}`);
-  if (rawLog) rawLog(`\x1b[32m[LStack] Sử dụng PHP: ${phpExe}\x1b[0m\r\n`);
+  if (rawLog) rawLog(`\x1b[32m[AVN-Stack] Sử dụng PHP: ${phpExe}\x1b[0m\r\n`);
 
   await spawnComposer(phpExe, [composerPhar, ...args], cwd, log, false, rawLog);
 }
 
-/** Find a PHP binary in LStack's bin dir. */
+/** Find a PHP binary in AVN-Stack's bin dir. */
 async function findPhpBinary(binDir: string, phpVersion?: string): Promise<string | null> {
   const isWin = process.platform === 'win32';
   const phpBase = path.join(binDir, 'php');
@@ -992,7 +1005,7 @@ async function spawnComposer(
     if (process.platform !== 'win32' && (err as NodeJS.ErrnoException)?.code === 'EACCES') {
       try {
         await fs.chmod(executable, 0o755);
-        rawLog?.(`\x1b[33m[LStack] Cấp lại quyền execute cho PHP rồi thử lại...\x1b[0m\r\n`);
+        rawLog?.(`\x1b[33m[AVN-Stack] Cấp lại quyền execute cho PHP rồi thử lại...\x1b[0m\r\n`);
         await doRun();
         return;
       } catch { /* fall through */ }
@@ -1054,7 +1067,7 @@ h1{font-size:30px;font-weight:800;letter-spacing:-.03em;margin-bottom:10px}
       <div class="panel-sub"><?= htmlspecialchars($_SERVER['SERVER_SOFTWARE'] ?? '') ?></div>
     </div>
   </div>
-  <div class="badge">Powered by LStack</div>
+  <div class="badge">Powered by AVN-Stack</div>
 </div>
 </body></html>
 `;
@@ -1070,7 +1083,7 @@ function isFrameworkRequiringDb(fw: string): boolean {
   return ['wordpress', 'laravel', 'symfony', 'codeigniter', 'drupal', 'joomla', 'prestashop'].includes(fw);
 }
 
-/** Find the mysql/mariadb client binary from LStack bins */
+/** Find the mysql/mariadb client binary from AVN-Stack bins */
 async function findMysqlClient(binDir: string, mariadbVersion: string): Promise<string | null> {
   const isWin = process.platform === 'win32';
   const exe = isWin ? '.exe' : '';
@@ -1110,7 +1123,7 @@ async function findMysqlClient(binDir: string, mariadbVersion: string): Promise<
 /** Create a MySQL database using the client binary, auto-starting MariaDB if needed */
 async function createDatabase(
   dbName: string,
-  settings: LStackSettings,
+  settings: AVNStackSettings,
   svcManager: ServiceManager,
   log: LogFn,
   rawLog: RawLogFn,
@@ -1173,7 +1186,7 @@ async function writeDbConfig(
   projectDir: string,
   dbName: string,
   projectName: string,
-  settings: LStackSettings,
+  settings: AVNStackSettings,
   log: LogFn,
   rawLog: RawLogFn,
 ): Promise<void> {
@@ -1284,7 +1297,7 @@ async function writeDbConfig(
         const localSettings = path.join(sitesDefault, 'settings.local.php');
         const dbConfig = `<?php
 /**
- * Auto-generated by LStack.
+ * Auto-generated by AVN-Stack.
  */
 $databases['default']['default'] = [
   'database' => '${dbName}',
@@ -1322,7 +1335,7 @@ $databases['default']['default'] = [
       const configPath = path.join(projectDir, 'configuration.php');
       const config = `<?php
 /**
- * Auto-generated by LStack. Complete Joomla installation via browser.
+ * Auto-generated by AVN-Stack. Complete Joomla installation via browser.
  */
 class JConfig {
   public $dbtype = 'mysqli';
@@ -1351,7 +1364,7 @@ class JConfig {
         const paramsPath = path.join(paramsDir, 'parameters.php');
         const params = `<?php
 /**
- * Auto-generated by LStack. Complete PrestaShop installation via browser.
+ * Auto-generated by AVN-Stack. Complete PrestaShop installation via browser.
  */
 return [
   'parameters' => [

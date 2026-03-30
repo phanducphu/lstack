@@ -2,7 +2,7 @@ import type { TranslationKey } from './vi';
 
 export const en: Record<TranslationKey, string> = {
   // ── App ────────────────────────────────────────────────────────────────────
-  'app.loading': 'Starting LStack...',
+  'app.loading': 'Starting AVN-Stack...',
 
   // ── Title bar ──────────────────────────────────────────────────────────────
   'titlebar.language': 'Language',
@@ -84,7 +84,7 @@ export const en: Record<TranslationKey, string> = {
 
   // ── Settings ───────────────────────────────────────────────────────────────
   'settings.title': 'Settings',
-  'settings.subtitle': 'Configure LStack',
+  'settings.subtitle': 'Configure AVN-Stack',
   'settings.section.directories': 'Directories',
   'settings.section.network': 'Network',
   'settings.section.webserver': 'Default web server',
@@ -104,7 +104,7 @@ export const en: Record<TranslationKey, string> = {
   'settings.field.autoVirtualHost': 'Auto-create Virtual Host',
   'settings.field.autoVirtualHostDescription': 'Create a .test domain when adding a folder to www/',
   'settings.field.autoStartServices': 'Auto-start services',
-  'settings.field.autoStartServicesDescription': 'Start Nginx, MariaDB, and PHP when LStack opens',
+  'settings.field.autoStartServicesDescription': 'Start Nginx, MariaDB, and PHP when AVN-Stack opens',
   'settings.button.selectDirectory': 'Choose directory',
   'settings.button.browse': 'Browse',
   'settings.button.save': 'Save settings',

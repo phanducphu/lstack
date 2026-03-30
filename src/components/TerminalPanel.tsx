@@ -41,7 +41,7 @@ function XTermInstance({ id, cwd, projectName, visible }: XTermInstanceProps) {
       try {
         fitRef.current.fit();
         const { cols, rows } = termRef.current;
-        window.lstack.terminal.resize(id, cols, rows);
+        window.avnstack.terminal.resize(id, cols, rows);
       } catch {
         // ignore during unmount
       }
@@ -95,18 +95,18 @@ function XTermInstance({ id, cwd, projectName, visible }: XTermInstanceProps) {
       fitAddon.fit();
       const { cols, rows } = term;
       // Create PTY session in main process
-      window.lstack.terminal.create(id, cwd, projectName).then(() => {
-        window.lstack.terminal.resize(id, cols, rows);
+      window.avnstack.terminal.create(id, cwd, projectName).then(() => {
+        window.avnstack.terminal.resize(id, cols, rows);
       });
     }, 50);
 
     // Forward user keystrokes to PTY
     term.onData((data) => {
-      window.lstack.terminal.write(id, data);
+      window.avnstack.terminal.write(id, data);
     });
 
     // Receive PTY output
-    const unsubData = window.lstack.terminal.onData((termId: string, data: string) => {
+    const unsubData = window.avnstack.terminal.onData((termId: string, data: string) => {
       if (termId === id) {
         term.write(data);
       }
@@ -114,17 +114,17 @@ function XTermInstance({ id, cwd, projectName, visible }: XTermInstanceProps) {
     unsubRef.current = unsubData;
 
     // Handle PTY exit
-    const unsubExit = window.lstack.terminal.onExit((termId: string) => {
+    const unsubExit = window.avnstack.terminal.onExit((termId: string) => {
       if (termId === id) {
         term.write('\r\n\x1b[2m[Process exited — press any key to restart]\x1b[0m');
         // Re-create on any key
         const disposable = term.onData(() => {
           disposable.dispose();
           term.reset();
-          window.lstack.terminal.create(id, cwd, projectName).then(() => {
+          window.avnstack.terminal.create(id, cwd, projectName).then(() => {
             if (fitRef.current) {
               fitRef.current.fit();
-              window.lstack.terminal.resize(id, term.cols, term.rows);
+              window.avnstack.terminal.resize(id, term.cols, term.rows);
             }
           });
         });
@@ -147,7 +147,7 @@ function XTermInstance({ id, cwd, projectName, visible }: XTermInstanceProps) {
       // effects twice in dev (mount → cleanup → mount). Without this, the
       // second mount calls terminal:create which kills the running session,
       // triggering onExit and showing "[Process exited]" immediately.
-      window.lstack.terminal.kill(id);
+      window.avnstack.terminal.kill(id);
       termRef.current = null;
       fitRef.current = null;
       initializedRef.current = false;

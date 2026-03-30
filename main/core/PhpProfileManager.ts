@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs-extra';
-import type { LStackSettings, PhpProfile, VHostPhpSettings } from '../../src/types';
+import type { AVNStackSettings, PhpProfile, VHostPhpSettings } from '../../src/types';
 
 // ─── Built-in PHP Profiles ──────────────────────────────────────────────────
 export const BUILT_IN_PROFILES: PhpProfile[] = [
@@ -101,15 +101,15 @@ export const BUILT_IN_PROFILES: PhpProfile[] = [
 
 // ─── PhpProfileManager ─────────────────────────────────────────────────────
 export class PhpProfileManager {
-  private settings: LStackSettings;
+  private settings: AVNStackSettings;
   private profilesFile: string;
 
-  constructor(settings: LStackSettings) {
+  constructor(settings: AVNStackSettings) {
     this.settings = settings;
     this.profilesFile = path.join(settings.dataDir, 'php-profiles.json');
   }
 
-  updateSettings(settings: LStackSettings): void {
+  updateSettings(settings: AVNStackSettings): void {
     this.settings = settings;
     this.profilesFile = path.join(settings.dataDir, 'php-profiles.json');
   }

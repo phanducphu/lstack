@@ -53,7 +53,7 @@ export function PhpProfiles() {
   const loadProfiles = useCallback(async () => {
     setLoading(true);
     try {
-      const list = await window.lstack.phpProfile.list();
+      const list = await window.avnstack.phpProfile.list();
       setProfiles(list);
       if (list.length > 0 && !selectedId) {
         setSelectedId(list[0].id);
@@ -68,7 +68,7 @@ export function PhpProfiles() {
   const loadBuiltInExtensions = useCallback(async (phpVersion: string) => {
     if (!phpVersion) { setBuiltInExts([]); return; }
     try {
-      const exts = await window.lstack.phpProfile.listBuiltInExtensions(phpVersion);
+      const exts = await window.avnstack.phpProfile.listBuiltInExtensions(phpVersion);
       setBuiltInExts(exts);
     } catch {
       setBuiltInExts([]);
@@ -135,10 +135,10 @@ export function PhpProfiles() {
       };
 
       if (selectedId && selectedId !== '__new__' && !selectedProfile?.isBuiltIn) {
-        await window.lstack.phpProfile.update(selectedId, payload);
+        await window.avnstack.phpProfile.update(selectedId, payload);
         addToast({ type: 'success', message: t('phpProfiles.save.updated') });
       } else {
-        const created = await window.lstack.phpProfile.create(payload);
+        const created = await window.avnstack.phpProfile.create(payload);
         addToast({ type: 'success', message: t('phpProfiles.save.created') });
         await loadProfiles();
         setSelectedId(created.id);
@@ -156,7 +156,7 @@ export function PhpProfiles() {
   const handleDelete = async () => {
     if (!selectedId || selectedId === '__new__' || selectedProfile?.isBuiltIn) return;
     try {
-      await window.lstack.phpProfile.delete(selectedId);
+      await window.avnstack.phpProfile.delete(selectedId);
       addToast({ type: 'success', message: t('phpProfiles.delete.success') });
       setSelectedId(null);
       await loadProfiles();

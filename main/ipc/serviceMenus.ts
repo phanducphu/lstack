@@ -1,11 +1,11 @@
 import { Menu, BrowserWindow, MenuItemConstructorOptions, shell } from 'electron';
 import path from 'path';
 import fs from 'fs-extra';
-import type { LStackSettings } from '../../src/types';
+import type { AVNStackSettings } from '../../src/types';
 
 export async function showApacheContextMenu(
   window: BrowserWindow | null,
-  settings: LStackSettings
+  settings: AVNStackSettings
 ) {
   if (!window) return;
 
@@ -87,7 +87,7 @@ export async function showApacheContextMenu(
 
 export async function showMariaDBContextMenu(
   window: BrowserWindow | null,
-  settings: LStackSettings
+  settings: AVNStackSettings
 ) {
   if (!window) return;
 
@@ -111,7 +111,7 @@ export async function showMariaDBContextMenu(
 
 export async function showPostgreSqlContextMenu(
   window: BrowserWindow | null,
-  settings: LStackSettings
+  settings: AVNStackSettings
 ) {
   if (!window) return;
 
@@ -146,7 +146,7 @@ export async function showPostgreSqlContextMenu(
 
 export async function showRedisContextMenu(
   window: BrowserWindow | null,
-  settings: LStackSettings
+  settings: AVNStackSettings
 ) {
   if (!window) return;
 
@@ -171,7 +171,7 @@ export async function showRedisContextMenu(
 
 export async function showMailpitContextMenu(
   window: BrowserWindow | null,
-  settings: LStackSettings
+  settings: AVNStackSettings
 ) {
   if (!window) return;
 
@@ -188,7 +188,7 @@ export async function showMailpitContextMenu(
 
 export async function showMemcachedContextMenu(
   window: BrowserWindow | null,
-  settings: LStackSettings
+  settings: AVNStackSettings
 ) {
   if (!window) return;
 

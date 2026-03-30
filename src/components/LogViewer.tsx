@@ -12,7 +12,7 @@ const LEVEL_COLORS: Record<string, string> = {
 
 interface Props {
   logs: LogEntry[];
-  onClear: (service?: ServiceName | 'lstack') => void;
+  onClear: (service?: ServiceName | 'avnstack') => void;
   maxHeight?: string;
 }
 

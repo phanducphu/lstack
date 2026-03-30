@@ -1,7 +1,7 @@
 import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
 import fs from 'fs-extra';
-import type { LStackSettings, LogEntry, VHostPhpSettings } from '../../src/types';
+import type { AVNStackSettings, LogEntry, VHostPhpSettings } from '../../src/types';
 
 export interface PhpFpmProcess {
   profileId: string;
@@ -12,21 +12,21 @@ export interface PhpFpmProcess {
 }
 
 export class PhpFpmManager {
-  private settings: LStackSettings;
+  private settings: AVNStackSettings;
   private processes: Map<string, PhpFpmProcess> = new Map();
   private log: (level: LogEntry['level'], message: string) => void;
 
   constructor(
-    settings: LStackSettings,
+    settings: AVNStackSettings,
     onLog: (entry: LogEntry) => void,
   ) {
     this.settings = settings;
     this.log = (level, message) => {
-      onLog({ service: 'lstack', level, message, timestamp: new Date().toISOString() });
+      onLog({ service: 'avnstack', level, message, timestamp: new Date().toISOString() });
     };
   }
 
-  updateSettings(settings: LStackSettings): void {
+  updateSettings(settings: AVNStackSettings): void {
     this.settings = settings;
   }
 

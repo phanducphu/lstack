@@ -1,6 +1,6 @@
 # Nhật ký thay đổi
 
-Tất cả các thay đổi đáng chú ý của LStack được ghi lại trong file này.  
+Tất cả các thay đổi đáng chú ý của AVN-Stack được ghi lại trong file này.  
 Định dạng: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · Phiên bản: [Semantic Versioning](https://semver.org/)
 
 Bản tiếng Anh: [CHANGELOG.md](CHANGELOG.md)
@@ -24,7 +24,7 @@ Bản tiếng Anh: [CHANGELOG.md](CHANGELOG.md)
 
 ## [1.0.0] - 2026-03-23
 
-Phiên bản ổn định đầu tiên của LStack.
+Phiên bản ổn định đầu tiên của AVN-Stack.
 
 ### Thêm mới
 
@@ -71,7 +71,7 @@ Phiên bản ổn định đầu tiên của LStack.
 - Hiện thị và chỉnh sửa profile được gán ngay trên card dự án
 
 #### Domain đặc biệt
-- `localhost.test` — dashboard / trang welcome của LStack, phục vụ bởi PHP-FPM profile `minimal`
+- `localhost.test` — dashboard / trang welcome của AVN-Stack, phục vụ bởi PHP-FPM profile `minimal`
 - `phpmyadmin.test` — phpMyAdmin tự động phục vụ; đăng nhập tự động root không cần mật khẩu
 - Cả hai domain được tự động thêm vào file `hosts` hệ thống khi khởi động lần đầu
 
@@ -101,7 +101,7 @@ Phiên bản ổn định đầu tiên của LStack.
 - Nút xoá log
 
 #### Cài đặt
-- Thư mục dự án tuỳ chỉnh (mặc định: `~/LStack/www/`)
+- Thư mục dự án tuỳ chỉnh (mặc định: `~/AVN-Stack/www/`)
 - Chọn web server (Nginx / Apache)
 - Phiên bản PHP mặc định cho profile mới
 - Trạng thái SSL provider và cài đặt CA
@@ -110,14 +110,14 @@ Phiên bản ổn định đầu tiên của LStack.
 - Dialog chọn thư mục cho các trường đường dẫn
 
 #### Dữ liệu & Cấu hình
-- Toàn bộ dữ liệu lưu tại `~/.lstack/` — không cài dịch vụ toàn hệ thống
-- Config Nginx/Apache, vhost, dữ liệu MariaDB, PostgreSQL, Redis, chứng chỉ và binary đều dưới `~/.lstack/`
+- Toàn bộ dữ liệu lưu tại `~/.avnstack/` — không cài dịch vụ toàn hệ thống
+- Config Nginx/Apache, vhost, dữ liệu MariaDB, PostgreSQL, Redis, chứng chỉ và binary đều dưới `~/.avnstack/`
 - `settings.json` và `php-profiles.json` trong thư mục dữ liệu
 - Hỗ trợ migration từ thư mục `~/.devstack/` cũ
 
 #### Nền tảng
-- **Windows x64** — installer NSIS (`LStack Setup 1.0.0.exe`)
-- **Linux x64** — AppImage (`LStack-1.0.0.AppImage`) và gói `.deb`
+- **Windows x64** — installer NSIS (`AVN-Stack Setup 1.0.0.exe`)
+- **Linux x64** — AppImage (`AVN-Stack-1.0.0.AppImage`) và gói `.deb`
 - Gói Linux được build và kiểm thử trên Ubuntu/Debian qua WSL hoặc Linux native
 
 ### Ghi chú

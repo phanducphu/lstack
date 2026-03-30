@@ -126,7 +126,7 @@ export interface ProjectCreateOptions {
 
 export type AppLanguage = 'vi' | 'en';
 
-export interface LStackSettings {
+export interface AVNStackSettings {
   wwwDir: string;
   dataDir: string;
   logsDir: string;
@@ -161,7 +161,7 @@ export interface LStackSettings {
 }
 
 export interface LogEntry {
-  service: ServiceName | 'lstack';
+  service: ServiceName | 'avnstack';
   level: 'info' | 'warn' | 'error' | 'debug';
   message: string;
   timestamp: string;
@@ -228,8 +228,8 @@ export interface IpcChannels {
   'vhost:remove': (name: string) => Promise<void>;
 
   // Settings
-  'settings:get': () => Promise<LStackSettings>;
-  'settings:set': (settings: Partial<LStackSettings>) => Promise<void>;
+  'settings:get': () => Promise<AVNStackSettings>;
+  'settings:set': (settings: Partial<AVNStackSettings>) => Promise<void>;
 
   // System
   'system:openDir': (path: string) => Promise<void>;
@@ -241,7 +241,7 @@ export interface IpcChannels {
 
 // Phpmyadmin config helper
 // Backward compatibility alias
-export type DevStackSettings = LStackSettings;
+export type DevStackSettings = AVNStackSettings;
 
 export interface PhpMyAdminConfig {
   host: string;

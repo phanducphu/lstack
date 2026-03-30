@@ -65,7 +65,7 @@ export function Sidebar({ activeTab, onTabChange }: Props) {
 
   const loadPhpRuntimes = useCallback(async () => {
     try {
-      const statuses = await window.lstack.phpProfile.listRuntimeStatuses();
+      const statuses = await window.avnstack.phpProfile.listRuntimeStatuses();
       setPhpRuntimes(statuses);
     } catch {
       // ignore
@@ -91,9 +91,9 @@ export function Sidebar({ activeTab, onTabChange }: Props) {
     updateService(service.name, { status: nextStatus });
     try {
       if (service.status === 'running') {
-        await window.lstack.service.stop(service.name);
+        await window.avnstack.service.stop(service.name);
       } else {
-        await window.lstack.service.start(service.name);
+        await window.avnstack.service.start(service.name);
       }
     } catch {
       updateService(service.name, { status: 'error' });
@@ -108,13 +108,13 @@ export function Sidebar({ activeTab, onTabChange }: Props) {
       for (const service of runningServices) {
         updateService(service.name, { status: 'stopping' });
         try {
-          await window.lstack.service.restart(service.name);
+          await window.avnstack.service.restart(service.name);
         } catch {
           updateService(service.name, { status: 'error' });
         }
       }
 
-      const statuses = await window.lstack.service.getStatuses();
+      const statuses = await window.avnstack.service.getStatuses();
       setServices(statuses);
     } finally {
       setReloading(false);
@@ -124,7 +124,7 @@ export function Sidebar({ activeTab, onTabChange }: Props) {
   const handleRestartRuntimes = async () => {
     setRestartingRuntimes(true);
     try {
-      await window.lstack.phpProfile.restartRuntimes();
+      await window.avnstack.phpProfile.restartRuntimes();
       await loadPhpRuntimes();
     } catch { /* ignore */ }
     finally {
@@ -141,10 +141,10 @@ export function Sidebar({ activeTab, onTabChange }: Props) {
       {/* Logo */}
       <div className="flex items-center gap-3 px-3 h-14 border-b border-slate-800">
         <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
-          <img src="./icon.png" alt="LStack" className="w-8 h-8 object-contain drop-shadow-md" />
+          <img src="./icon.png" alt="AVN-Stack" className="w-8 h-8 object-contain drop-shadow-md" />
         </div>
         {!sidebarCollapsed && (
-          <span className="font-bold text-blue-400 text-lg tracking-wide">LStack</span>
+          <span className="font-bold text-blue-400 text-lg tracking-wide">AVN-Stack</span>
         )}
       </div>
 
@@ -192,7 +192,7 @@ export function Sidebar({ activeTab, onTabChange }: Props) {
                     className="rounded-lg hover:bg-slate-800 transition-colors"
                     onContextMenu={(e) => {
                       e.preventDefault();
-                      window.lstack.service.showContextMenu(service.name);
+                      window.avnstack.service.showContextMenu(service.name);
                     }}
                   >
                     <div className="flex items-center justify-between px-2 py-1.5 min-w-0">
@@ -212,7 +212,7 @@ export function Sidebar({ activeTab, onTabChange }: Props) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.lstack.service.showContextMenu(service.name);
+                            window.avnstack.service.showContextMenu(service.name);
                           }}
                           className="p-1.5 text-slate-500 hover:text-blue-400 hover:bg-slate-700/50 rounded transition-colors"
                           title={t('sidebar.configureService', { service: service.label })}

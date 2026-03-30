@@ -145,7 +145,7 @@ export function Projects() {
   const loadProjects = async () => {
     setLoading(true);
     try {
-      const list = await window.lstack.project.list();
+      const list = await window.avnstack.project.list();
       setProjects(list);
     } finally {
       setLoading(false);
@@ -155,9 +155,9 @@ export function Projects() {
   const handleCreate = async () => {
     if (!newName.trim()) return;
     setCreating(true);
-    clearLogs('lstack');
+    clearLogs('avnstack');
     try {
-      await window.lstack.project.create(newName.trim(), newTemplate, {
+      await window.avnstack.project.create(newName.trim(), newTemplate, {
         frameworkVersion: newFrameworkVersion || undefined,
         projectPath: customPath || undefined,
       });
@@ -176,14 +176,14 @@ export function Projects() {
   };
 
   const handleSelectCustomPath = async () => {
-    const path = await window.lstack.system.selectDir();
+    const path = await window.avnstack.system.selectDir();
     if (path) setCustomPath(path);
   };
 
   const handleDelete = async (name: string) => {
     setConfirmDelete(null);
     try {
-      await window.lstack.project.delete(name);
+      await window.avnstack.project.delete(name);
       addToast({ type: 'success', message: t('projects.delete.success', { name }) });
       await loadProjects();
     } catch (err: any) {
@@ -200,7 +200,7 @@ export function Projects() {
   const openPhpModal = useCallback(async (project: Project) => {
     setPhpModalProject(project);
     try {
-      const profiles = await window.lstack.phpProfile.list();
+      const profiles = await window.avnstack.phpProfile.list();
       setPhpProfiles(profiles);
       setSelectedProfileId(project.vhost?.phpProfileId ?? '');
     } catch { /* ignore */ }
@@ -210,7 +210,7 @@ export function Projects() {
     if (!phpModalProject || !selectedProfileId) return;
     setSavingProfile(true);
     try {
-      await window.lstack.vhost.updatePhpProfile(phpModalProject.name, selectedProfileId);
+      await window.avnstack.vhost.updatePhpProfile(phpModalProject.name, selectedProfileId);
       addToast({ type: 'success', message: t('projects.modal.updateProfileSuccess') });
       setPhpModalProject(null);
       await loadProjects();
@@ -281,7 +281,7 @@ export function Projects() {
             {pmaVersions.length > 0 && (
               pmaVersions.length === 1 ? (
                 <button
-                  onClick={() => window.lstack.system.openBrowser(`http://phpmyadmin.test:${settings?.httpPort || 80}`)}
+                  onClick={() => window.avnstack.system.openBrowser(`http://phpmyadmin.test:${settings?.httpPort || 80}`)}
                   className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-slate-700/80 border border-slate-700 hover:border-slate-600 text-slate-200 text-sm font-medium rounded-full transition-all focus:outline-none whitespace-nowrap shrink-0"
                   title={`${t('projects.openPhpMyAdmin', { version: pmaVersions[0] })}`}
                 >
@@ -302,7 +302,7 @@ export function Projects() {
                     {pmaVersions.map(v => (
                       <button
                         key={v}
-                        onClick={() => window.lstack.system.openBrowser(`http://phpmyadmin.test:${settings?.httpPort || 80}`)}
+                        onClick={() => window.avnstack.system.openBrowser(`http://phpmyadmin.test:${settings?.httpPort || 80}`)}
                         className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-slate-200 hover:bg-blue-600/10 hover:text-blue-300 transition-colors whitespace-nowrap"
                       >
                         <Database className="w-4 h-4 text-slate-400" />
@@ -601,7 +601,7 @@ function ProjectItem({ project, viewMode, confirmingDelete, onDeleteRequest, onD
             {project.name}
           </h3>
           <a
-            onClick={() => window.lstack.system.openBrowser(url)}
+            onClick={() => window.avnstack.system.openBrowser(url)}
             className="text-xs text-slate-400 hover:text-blue-400 cursor-pointer flex items-center gap-1 mt-0.5 truncate max-w-full font-mono"
             title={url}
           >
@@ -640,13 +640,13 @@ function ProjectItem({ project, viewMode, confirmingDelete, onDeleteRequest, onD
           </div>
         ) : (
           <div className="flex items-center gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
-            <button onClick={() => window.lstack.system.openBrowser(url)} className="p-2 bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-400 rounded-xl transition-all" title={t('projects.workspace')}>
+            <button onClick={() => window.avnstack.system.openBrowser(url)} className="p-2 bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-400 rounded-xl transition-all" title={t('projects.workspace')}>
               <Globe className="w-4 h-4" />
             </button>
             <button onClick={onOpenTerminal} className="p-2 bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-400 rounded-xl transition-all" title={t('projects.openTerminal')}>
               <TerminalSquare className="w-4 h-4" />
             </button>
-            <button onClick={() => window.lstack.project.open(project.path)} className="p-2 bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-400 rounded-xl transition-all" title={t('projects.openExplorer')}>
+            <button onClick={() => window.avnstack.project.open(project.path)} className="p-2 bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-400 rounded-xl transition-all" title={t('projects.openExplorer')}>
               <FolderOpen className="w-4 h-4" />
             </button>
             <button onClick={onOpenPhpConfig} className="p-2 bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-400 rounded-xl transition-all" title={t('projects.modal.phpConfiguration')}>

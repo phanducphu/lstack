@@ -27,9 +27,9 @@ export function InstallTerminal({ type = 'project' }: { type?: 'project' | 'pack
     let unsub = () => {};
 
     if (type === 'project') {
-      unsub = window.lstack.project.onInstallLog(handler);
+      unsub = window.avnstack.project.onInstallLog(handler);
     } else if (type === 'package') {
-      unsub = window.lstack.package.onInstallLog(handler);
+      unsub = window.avnstack.package.onInstallLog(handler);
     }
 
     return () => {

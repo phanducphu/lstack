@@ -1,11 +1,11 @@
 import { Menu, BrowserWindow, MenuItemConstructorOptions, shell } from 'electron';
 import path from 'path';
 import fs from 'fs-extra';
-import type { LStackSettings } from '../../src/types';
+import type { AVNStackSettings } from '../../src/types';
 
 export async function showNginxContextMenu(
   window: BrowserWindow | null,
-  settings: LStackSettings
+  settings: AVNStackSettings
 ) {
   if (!window) return;
 

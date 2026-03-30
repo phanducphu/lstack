@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import extractZip from 'extract-zip';
 import { createWriteStream } from 'fs';
-import type { PackageCategory, PackageVersion, DownloadProgress, Platform, LStackSettings } from '../../src/types';
+import type { PackageCategory, PackageVersion, DownloadProgress, Platform, AVNStackSettings } from '../../src/types';
 
 // ─── Packages Registry ────────────────────────────────────────────────────────
 // Official download URLs for all packages, all platforms
@@ -148,7 +148,7 @@ export class PackageManager {
     return result;
   }
 
-  async install(categoryId: string, version: string, settings?: LStackSettings): Promise<void> {
+  async install(categoryId: string, version: string, settings?: AVNStackSettings): Promise<void> {
     const packageId = `${categoryId}-${version}`;
     this.onInstallLog?.(`\r\n\x1b[36m==>\x1b[0m Starting installation of ${packageId}...\r\n`);
     
@@ -560,7 +560,7 @@ export class PackageManager {
     }
   }
 
-  public async reconfigureAdminTools(settings: LStackSettings): Promise<void> {
+  public async reconfigureAdminTools(settings: AVNStackSettings): Promise<void> {
     const pmaVersions = ['6.0-snapshot', '5.2.3', '5.2.2'];
     for (const ver of pmaVersions) {
       const pmaDir = this.getInstallPath('phpmyadmin', ver);
@@ -570,7 +570,7 @@ export class PackageManager {
     }
   }
 
-  private async generatePhpMyAdminConfig(installDir: string, settings: LStackSettings): Promise<void> {
+  private async generatePhpMyAdminConfig(installDir: string, settings: AVNStackSettings): Promise<void> {
     const configFile = path.join(installDir, 'config.inc.php');
     const secret = Math.random().toString(36).substring(2, 42);
     

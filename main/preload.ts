@@ -6,7 +6,7 @@ import type {
   Project,
   ProjectCreateOptions,
   VHost,
-  LStackSettings,
+  AVNStackSettings,
   LogEntry,
   DownloadProgress,
   PhpProfile,
@@ -145,8 +145,8 @@ const api = {
 
   // ── Settings ──────────────────────────────────────────────────────────────
   settings: {
-    get: (): Promise<LStackSettings> => ipcRenderer.invoke('settings:get'),
-    set: (s: Partial<LStackSettings>) => ipcRenderer.invoke('settings:set', s),
+    get: (): Promise<AVNStackSettings> => ipcRenderer.invoke('settings:get'),
+    set: (s: Partial<AVNStackSettings>) => ipcRenderer.invoke('settings:set', s),
   },
 
   // ── System ────────────────────────────────────────────────────────────────
@@ -165,7 +165,7 @@ const api = {
   },
 };
 
-contextBridge.exposeInMainWorld('lstack', api);
+contextBridge.exposeInMainWorld('avnstack', api);
 
-// TypeScript type augmentation for window.lstack
-export type LStackAPI = typeof api;
+// TypeScript type augmentation for window.avnstack
+export type AVNStackAPI = typeof api;

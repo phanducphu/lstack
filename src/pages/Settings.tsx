@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Save, FolderOpen, CheckCircle, XCircle, Download, Loader } from 'lucide-react';
 import { useSettingsStore, useUIStore, useToastStore } from '../store';
-import type { CertStatus, LStackSettings, SslProviderStatus } from '../types';
+import type { CertStatus, AVNStackSettings, SslProviderStatus } from '../types';
 import { useTranslation } from '../i18n';
 
 export function Settings() {
@@ -9,7 +9,7 @@ export function Settings() {
   const { platform } = useUIStore();
   const { addToast } = useToastStore();
   const { t } = useTranslation();
-  const [form, setForm] = useState<LStackSettings | null>(null);
+  const [form, setForm] = useState<AVNStackSettings | null>(null);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [certStatus, setCertStatus] = useState<CertStatus | null>(null);
@@ -22,10 +22,10 @@ export function Settings() {
   }, [settings]);
 
   useEffect(() => {
-    window.lstack.cert.status().then(setCertStatus).catch(() => {});
+    window.avnstack.cert.status().then(setCertStatus).catch(() => {});
   }, []);
 
-  const update = (patch: Partial<LStackSettings>) => {
+  const update = (patch: Partial<AVNStackSettings>) => {
     setForm((f) => f ? { ...f, ...patch } : f);
   };
 
@@ -33,7 +33,7 @@ export function Settings() {
     if (!form || saving) return;
     setSaving(true);
     try {
-      await window.lstack.settings.set(form);
+      await window.avnstack.settings.set(form);
       setSettings(form);
       addToast({ type: 'success', message: t('settings.save.success') });
       setSaved(true);
@@ -45,8 +45,8 @@ export function Settings() {
     }
   };
 
-  const handleSelectDir = async (field: keyof LStackSettings) => {
-    const dir = await window.lstack.system.selectDir();
+  const handleSelectDir = async (field: keyof AVNStackSettings) => {
+    const dir = await window.avnstack.system.selectDir();
     if (dir) update({ [field]: dir });
   };
 
@@ -54,8 +54,8 @@ export function Settings() {
     setCertInstalling(true);
     setCertError(null);
     try {
-      await window.lstack.cert.install();
-      const status = await window.lstack.cert.status();
+      await window.avnstack.cert.install();
+      const status = await window.avnstack.cert.status();
       setCertStatus(status);
       addToast({ type: 'success', message: t('settings.ssl.install.success') });
     } catch (err: any) {

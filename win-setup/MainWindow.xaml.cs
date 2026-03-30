@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
@@ -275,7 +275,7 @@ public partial class MainWindow : Window
             key.SetValue("DisplayIcon", exePath);
             key.SetValue("UninstallString",
                 $"\"{Path.Combine(_installPath, "uninstall.cmd")}\"");
-            key.SetValue("URLInfoAbout", "https://github.com/marixdev/lstack");
+            key.SetValue("URLInfoAbout", "https://avn.io.vn");
             key.SetValue("NoModify", 1, RegistryValueKind.DWord);
             key.SetValue("NoRepair", 1, RegistryValueKind.DWord);
 

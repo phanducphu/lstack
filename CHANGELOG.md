@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to LStack are documented in this file.  
+All notable changes to AVN-Stack are documented in this file.  
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · Versioning: [Semantic Versioning](https://semver.org/)
 
 Vietnamese version: [CHANGELOG.vi.md](CHANGELOG.vi.md)
@@ -24,7 +24,7 @@ Vietnamese version: [CHANGELOG.vi.md](CHANGELOG.vi.md)
 
 ## [1.0.0] - 2026-03-23
 
-First stable release of LStack.
+First stable release of AVN-Stack.
 
 ### Added
 
@@ -71,7 +71,7 @@ First stable release of LStack.
 - Profile assignment shown and editable from the project card
 
 #### Special Domains
-- `localhost.test` — LStack dashboard / PHP info welcome page served by the `minimal` PHP-FPM profile
+- `localhost.test` — AVN-Stack dashboard / PHP info welcome page served by the `minimal` PHP-FPM profile
 - `phpmyadmin.test` — phpMyAdmin served automatically; root auto-login with no password required
 - Both entries added to the system `hosts` file automatically on first launch
 
@@ -101,7 +101,7 @@ First stable release of LStack.
 - Clear log button
 
 #### Settings
-- Configurable projects directory (default: `~/LStack/www/`)
+- Configurable projects directory (default: `~/AVN-Stack/www/`)
 - Web server selector (Nginx / Apache)
 - Default PHP version for new profiles
 - SSL provider status and CA installation
@@ -110,14 +110,14 @@ First stable release of LStack.
 - Folder picker dialog for path fields
 
 #### Data & Configuration
-- All data stored in `~/.lstack/` — no system-wide service installs polluted
-- Nginx and Apache configs, vhosts, MariaDB data, PostgreSQL data, Redis config, certificates, and downloaded binaries all under `~/.lstack/`
+- All data stored in `~/.avnstack/` — no system-wide service installs polluted
+- Nginx and Apache configs, vhosts, MariaDB data, PostgreSQL data, Redis config, certificates, and downloaded binaries all under `~/.avnstack/`
 - `settings.json` and `php-profiles.json` in the data directory
 - Graceful migration path from legacy `~/.devstack/` directory
 
 #### Platforms
-- **Windows x64** — NSIS installer (`LStack Setup 1.0.0.exe`)
-- **Linux x64** — AppImage (`LStack-1.0.0.AppImage`) and `.deb` package
+- **Windows x64** — NSIS installer (`AVN-Stack Setup 1.0.0.exe`)
+- **Linux x64** — AppImage (`AVN-Stack-1.0.0.AppImage`) and `.deb` package
 - Linux packages built and tested on Ubuntu/Debian via WSL or native Linux
 
 ### Notes

@@ -1,7 +1,7 @@
 {
-  "name": "lstack",
+  "name": "avn-stack",
   "version": "1.1.0",
-  "description": "Local development environment for Windows and Linux",
+  "description": "AVN-Stack: Local development environment for MacOS, Windows & Linux",
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
@@ -15,19 +15,15 @@
     "lint": "eslint --ext .ts,.tsx src electron"
   },
   "keywords": [
-    "lstack",
+    "avnstack",
     "local-dev",
     "electron",
     "php",
     "nginx"
   ],
-  "author": "LStack",
+  "author": "Steven Phan",
   "license": "GPL-3.0",
-  "homepage": "https://lstack.dev",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/marixdev/lstack.git"
-  },
+  "homepage": "https://avn.io.vn",
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.0.0",

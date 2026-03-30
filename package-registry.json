@@ -66,7 +66,7 @@
         "downloads": {
           "win32": "https://nginx.org/download/nginx-1.27.4.zip",
           "darwin": "https://nginx.org/download/nginx-1.27.4.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/nginx-v1.27.4/nginx-1.27.4-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/nginx-v1.27.4/nginx-1.27.4-native-linux-x64.tar.gz"
         }
       },
       {
@@ -76,7 +76,7 @@
         "downloads": {
           "win32": "https://nginx.org/download/nginx-1.26.3.zip",
           "darwin": "https://nginx.org/download/nginx-1.26.3.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/nginx-v1.26.3/nginx-1.26.3-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/nginx-v1.26.3/nginx-1.26.3-native-linux-x64.tar.gz"
         }
       },
       {
@@ -86,7 +86,7 @@
         "downloads": {
           "win32": "https://nginx.org/download/nginx-1.24.0.zip",
           "darwin": "https://nginx.org/download/nginx-1.24.0.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/nginx-v1.24.0/nginx-1.24.0-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/nginx-v1.24.0/nginx-1.24.0-native-linux-x64.tar.gz"
         }
       },
       {
@@ -96,7 +96,7 @@
         "downloads": {
           "win32": "https://nginx.org/download/nginx-1.22.1.zip",
           "darwin": "https://nginx.org/download/nginx-1.22.1.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/nginx-v1.22.1/nginx-1.22.1-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/nginx-v1.22.1/nginx-1.22.1-native-linux-x64.tar.gz"
         }
       },
       {
@@ -106,7 +106,7 @@
         "downloads": {
           "win32": "https://nginx.org/download/nginx-1.20.2.zip",
           "darwin": "https://nginx.org/download/nginx-1.20.2.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/nginx-v1.20.2/nginx-1.20.2-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/nginx-v1.20.2/nginx-1.20.2-native-linux-x64.tar.gz"
         }
       }
     ]
@@ -123,7 +123,7 @@
         "downloads": {
           "win32": "https://windows.php.net/downloads/releases/php-8.6.0-nts-Win32-vs16-x64.zip",
           "darwin": "https://github.com/shivammathur/php-builder-macos/releases/download/8.6/php_8.6.0_arm64.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/php-v8.6.0/php-8.6.0-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/php-v8.6.0/php-8.6.0-native-linux-x64.tar.gz"
         }
       },
       {
@@ -133,7 +133,7 @@
         "downloads": {
           "win32": "https://windows.php.net/downloads/releases/php-8.5.4-nts-Win32-vs16-x64.zip",
           "darwin": "https://github.com/shivammathur/php-builder-macos/releases/download/8.5/php_8.5.4_arm64.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/php-v8.5.4/php-8.5.4-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/php-v8.5.4/php-8.5.4-native-linux-x64.tar.gz"
         }
       },
       {
@@ -143,7 +143,7 @@
         "downloads": {
           "win32": "https://windows.php.net/downloads/releases/php-8.4.4-nts-Win32-vs16-x64.zip",
           "darwin": "https://github.com/shivammathur/php-builder-macos/releases/download/8.4/php_8.4.4_arm64.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/php-v8.4.4/php-8.4.4-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/php-v8.4.4/php-8.4.4-native-linux-x64.tar.gz"
         }
       },
       {
@@ -153,7 +153,7 @@
         "downloads": {
           "win32": "https://windows.php.net/downloads/releases/php-8.3.17-nts-Win32-vs16-x64.zip",
           "darwin": "https://github.com/shivammathur/php-builder-macos/releases/download/8.3/php_8.3.17_arm64.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/php-v8.3.17/php-8.3.17-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/php-v8.3.17/php-8.3.17-native-linux-x64.tar.gz"
         }
       },
       {
@@ -163,7 +163,7 @@
         "downloads": {
           "win32": "https://windows.php.net/downloads/releases/php-8.2.27-nts-Win32-vs16-x64.zip",
           "darwin": "https://github.com/shivammathur/php-builder-macos/releases/download/8.2/php_8.2.27_arm64.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/php-v8.2.27/php-8.2.27-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/php-v8.2.27/php-8.2.27-native-linux-x64.tar.gz"
         }
       },
       {
@@ -173,7 +173,7 @@
         "downloads": {
           "win32": "https://windows.php.net/downloads/releases/php-8.1.31-nts-Win32-vs16-x64.zip",
           "darwin": "https://github.com/shivammathur/php-builder-macos/releases/download/8.1/php_8.1.31_arm64.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/php-v8.1.31/php-8.1.31-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/php-v8.1.31/php-8.1.31-native-linux-x64.tar.gz"
         }
       },
       {
@@ -183,7 +183,7 @@
         "downloads": {
           "win32": "https://windows.php.net/downloads/releases/php-8.0.30-nts-Win32-vs16-x64.zip",
           "darwin": "https://github.com/shivammathur/php-builder-macos/releases/download/8.0/php_8.0.30_arm64.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/php-v8.0.30/php-8.0.30-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/php-v8.0.30/php-8.0.30-native-linux-x64.tar.gz"
         }
       },
       {
@@ -193,7 +193,7 @@
         "downloads": {
           "win32": "https://windows.php.net/downloads/releases/php-7.4.33-nts-Win32-vc15-x64.zip",
           "darwin": "https://github.com/shivammathur/php-builder-macos/releases/download/7.4/php_7.4.33_arm64.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/php-v7.4.33/php-7.4.33-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/php-v7.4.33/php-7.4.33-native-linux-x64.tar.gz"
         }
       },
       {
@@ -203,7 +203,7 @@
         "downloads": {
           "win32": "https://windows.php.net/downloads/releases/php-7.3.33-nts-Win32-vc15-x64.zip",
           "darwin": "https://github.com/shivammathur/php-builder-macos/releases/download/7.3/php_7.3.33_arm64.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/php-v7.3.33/php-7.3.33-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/php-v7.3.33/php-7.3.33-native-linux-x64.tar.gz"
         }
       },
       {
@@ -213,7 +213,7 @@
         "downloads": {
           "win32": "https://windows.php.net/downloads/releases/php-7.2.34-nts-Win32-vc15-x64.zip",
           "darwin": "https://github.com/shivammathur/php-builder-macos/releases/download/7.2/php_7.2.34_arm64.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/php-v7.2.34/php-7.2.34-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/php-v7.2.34/php-7.2.34-native-linux-x64.tar.gz"
         }
       },
       {
@@ -223,7 +223,7 @@
         "downloads": {
           "win32": "https://windows.php.net/downloads/releases/php-7.1.33-nts-Win32-vc14-x64.zip",
           "darwin": "https://github.com/shivammathur/php-builder-macos/releases/download/7.1/php_7.1.33_arm64.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/php-v7.1.33/php-7.1.33-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/php-v7.1.33/php-7.1.33-native-linux-x64.tar.gz"
         }
       },
       {
@@ -233,7 +233,7 @@
         "downloads": {
           "win32": "https://windows.php.net/downloads/releases/php-7.0.33-nts-Win32-vc14-x64.zip",
           "darwin": "https://github.com/shivammathur/php-builder-macos/releases/download/7.0/php_7.0.33_arm64.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/php-v7.0.33/php-7.0.33-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/php-v7.0.33/php-7.0.33-native-linux-x64.tar.gz"
         }
       },
       {
@@ -243,7 +243,7 @@
         "downloads": {
           "win32": "https://windows.php.net/downloads/releases/php-5.6.40-nts-Win32-vc11-x64.zip",
           "darwin": "https://github.com/shivammathur/php-builder-macos/releases/download/5.6/php_5.6.40_arm64.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/php-v5.6.40/php-5.6.40-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/php-v5.6.40/php-5.6.40-native-linux-x64.tar.gz"
         }
       }
     ]
@@ -345,7 +345,7 @@
         "downloads": {
           "win32": "https://www.apachelounge.com/download/VS17/binaries/httpd-2.4.63-win64-VS17.zip",
           "darwin": "https://archive.apache.org/dist/httpd/httpd-2.4.63.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/apache-v2.4.63/apache-2.4.63-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/apache-v2.4.63/apache-2.4.63-native-linux-x64.tar.gz"
         }
       },
       {
@@ -355,7 +355,7 @@
         "downloads": {
           "win32": "https://www.apachelounge.com/download/VS17/binaries/httpd-2.4.62-win64-VS17.zip",
           "darwin": "https://archive.apache.org/dist/httpd/httpd-2.4.62.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/apache-v2.4.62/apache-2.4.62-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/apache-v2.4.62/apache-2.4.62-native-linux-x64.tar.gz"
         }
       },
       {
@@ -365,7 +365,7 @@
         "downloads": {
           "win32": "https://www.apachelounge.com/download/VS17/binaries/httpd-2.4.61-win64-VS17.zip",
           "darwin": "https://archive.apache.org/dist/httpd/httpd-2.4.61.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/apache-v2.4.61/apache-2.4.61-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/apache-v2.4.61/apache-2.4.61-native-linux-x64.tar.gz"
         }
       },
       {
@@ -375,7 +375,7 @@
         "downloads": {
           "win32": "https://www.apachelounge.com/download/VS17/binaries/httpd-2.4.58-win64-VS17.zip",
           "darwin": "https://archive.apache.org/dist/httpd/httpd-2.4.58.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/apache-v2.4.58/apache-2.4.58-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/apache-v2.4.58/apache-2.4.58-native-linux-x64.tar.gz"
         }
       },
       {
@@ -385,7 +385,7 @@
         "downloads": {
           "win32": "https://www.apachelounge.com/download/VS17/binaries/httpd-2.4.54-win64-VS17.zip",
           "darwin": "https://archive.apache.org/dist/httpd/httpd-2.4.54.tar.gz",
-          "linux": "https://github.com/marixdev/lstack-binaries/releases/download/apache-v2.4.54/apache-2.4.54-native-linux-x64.tar.gz"
+          "linux": "https://github.com/marixdev/avnstack-binaries/releases/download/apache-v2.4.54/apache-2.4.54-native-linux-x64.tar.gz"
         }
       }
     ]

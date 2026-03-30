@@ -1,6 +1,6 @@
 export const vi = {
   // ── App ────────────────────────────────────────────────────────────────────
-  'app.loading': 'Đang khởi động LStack...',
+  'app.loading': 'Đang khởi động AVN-Stack...',
 
   // ── Title bar ──────────────────────────────────────────────────────────────
   'titlebar.language': 'Ngôn ngữ',
@@ -82,7 +82,7 @@ export const vi = {
 
   // ── Settings ───────────────────────────────────────────────────────────────
   'settings.title': 'Cài đặt',
-  'settings.subtitle': 'Cấu hình LStack',
+  'settings.subtitle': 'Cấu hình AVN-Stack',
   'settings.section.directories': 'Thư mục',
   'settings.section.network': 'Mạng',
   'settings.section.webserver': 'Web server mặc định',
@@ -102,7 +102,7 @@ export const vi = {
   'settings.field.autoVirtualHost': 'Tự động tạo Virtual Host',
   'settings.field.autoVirtualHostDescription': 'Tạo domain .test khi thêm thư mục vào www/',
   'settings.field.autoStartServices': 'Tự động khởi động dịch vụ',
-  'settings.field.autoStartServicesDescription': 'Khởi động Nginx, MariaDB, PHP khi mở LStack',
+  'settings.field.autoStartServicesDescription': 'Khởi động Nginx, MariaDB, PHP khi mở AVN-Stack',
   'settings.button.selectDirectory': 'Chọn thư mục',
   'settings.button.browse': 'Duyệt',
   'settings.button.save': 'Lưu cài đặt',

@@ -1,20 +1,20 @@
-﻿# LStack
+﻿# AVN-Stack
 
-> Local development environment for Windows and Linux.  
+> Local development environment for MacOS, Windows and Linux.  
 > A modern, Electron-based alternative to Laragon — manage PHP services, virtual hosts, databases, and projects from a clean GUI.
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey)](#installation)
 [![Version](https://img.shields.io/badge/version-1.0.0-green)](CHANGELOG.md)
 
-**Homepage:** https://lstack.dev  
-**GitHub:** https://github.com/marixdev/lstack
+**Homepage:** https://avnstack.dev  
+**GitHub:** https://github.com/marixdev/avnstack
 
 ---
 
 ## Overview
 
-LStack is a desktop application that manages a full local PHP development stack — web servers, databases, caches, and mail — without any Docker or WSL dependency. Services run as native processes; projects are served over `.test` domains with optional SSL via mkcert.
+AVN-Stack is a desktop application that manages a full local PHP development stack — web servers, databases, caches, and mail — without any Docker or WSL dependency. Services run as native processes; projects are served over `.test` domains with optional SSL via mkcert.
 
 Built with **Electron 32**, **React 18**, **TypeScript 5**, **Vite 5**, and **Tailwind CSS 3**.
 
@@ -72,7 +72,7 @@ Each PHP-FPM profile runs as a separate process with its own port and `php.ini` 
 
 ## Project Templates
 
-When creating a new project, LStack can scaffold one of the following:
+When creating a new project, AVN-Stack can scaffold one of the following:
 
 | Template     | Versions supported                          |
 |--------------|---------------------------------------------|
@@ -91,7 +91,7 @@ When creating a new project, LStack can scaffold one of the following:
 
 | Domain             | Purpose                                |
 |--------------------|----------------------------------------|
-| `localhost.test`   | LStack dashboard / welcome page        |
+| `localhost.test`   | AVN-Stack dashboard / welcome page        |
 | `phpmyadmin.test`  | phpMyAdmin (auto-login as root)        |
 
 Both entries are automatically added to the system `hosts` file on first launch.
@@ -102,36 +102,36 @@ Both entries are automatically added to the system `hosts` file on first launch.
 
 ### Pre-built binaries
 
-Download the latest release from the [Releases page](https://github.com/marixdev/lstack/releases) or from [lstack.dev](https://lstack.dev):
+Download the latest release from the [Releases page](https://github.com/marixdev/avnstack/releases) or from [avnstack.dev](https://avnstack.dev):
 
 | Platform    | Installer                       |
 |-------------|---------------------------------|
-| Windows x64 | `LStack Setup 1.0.0.exe`        |
-| Linux x64   | `LStack-1.0.0.AppImage`         |
-| Linux x64   | `lstack_1.0.0_amd64.deb`        |
-| Linux x64   | `lstack-1.0.0.x86_64.rpm`       |
+| Windows x64 | `AVN-Stack Setup 1.0.0.exe`        |
+| Linux x64   | `AVN-Stack-1.0.0.AppImage`         |
+| Linux x64   | `avnstack_1.0.0_amd64.deb`        |
+| Linux x64   | `avnstack-1.0.0.x86_64.rpm`       |
 
-**Windows** — run the NSIS installer and launch LStack from the Start Menu.
+**Windows** — run the NSIS installer and launch AVN-Stack from the Start Menu.
 
 **Linux (AppImage):**
 
 ```bash
-chmod +x LStack-1.0.0.AppImage
-./LStack-1.0.0.AppImage
+chmod +x AVN-Stack-1.0.0.AppImage
+./AVN-Stack-1.0.0.AppImage
 ```
 
 **Linux (.deb):**
 
 ```bash
-sudo dpkg -i lstack_1.0.0_amd64.deb
-lstack
+sudo dpkg -i avnstack_1.0.0_amd64.deb
+avnstack
 ```
 
 **Linux (.rpm):**
 
 ```bash
-sudo rpm -i lstack-1.0.0.x86_64.rpm
-lstack
+sudo rpm -i avnstack-1.0.0.x86_64.rpm
+avnstack
 ```
 
 ---
@@ -147,8 +147,8 @@ lstack
 ### Steps
 
 ```bash
-git clone https://github.com/marixdev/lstack.git
-cd lstack
+git clone https://github.com/marixdev/avnstack.git
+cd avnstack
 npm install
 ```
 
@@ -174,10 +174,10 @@ Output is placed in the `release/` directory.
 
 ## Data Directory
 
-LStack stores all configuration, service data, certificates, and downloaded binaries under:
+AVN-Stack stores all configuration, service data, certificates, and downloaded binaries under:
 
 ```
-~/.lstack/
+~/.avnstack/
 ├── nginx/             # Nginx config & virtual hosts
 ├── apache/            # Apache config & virtual hosts
 ├── mariadb/           # MariaDB data files
@@ -189,7 +189,7 @@ LStack stores all configuration, service data, certificates, and downloaded bina
 └── settings.json      # App settings
 ```
 
-All data is self-contained — uninstalling LStack does not touch your databases or configuration unless you delete this directory manually.
+All data is self-contained — uninstalling AVN-Stack does not touch your databases or configuration unless you delete this directory manually.
 
 ---
 
@@ -199,7 +199,7 @@ Configurable from the Settings page:
 
 | Setting              | Description                                              |
 |----------------------|----------------------------------------------------------|
-| Projects directory   | Root folder scanned for projects (default: `~/LStack/www/`) |
+| Projects directory   | Root folder scanned for projects (default: `~/AVN-Stack/www/`) |
 | Web server           | Nginx or Apache                                          |
 | PHP version          | Default PHP version for new profiles                     |
 | SSL provider         | mkcert; install and trust the local CA from the UI       |
@@ -210,5 +210,5 @@ Configurable from the Settings page:
 
 ## License
 
-[GPL-3.0](LICENSE) © LStack — https://lstack.dev
+[GPL-3.0](LICENSE) © AVN-Stack — https://avnstack.dev
 

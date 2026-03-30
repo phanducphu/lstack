@@ -34,7 +34,7 @@ export function disposeTerminal(id: string) {
     }
     terminalRegistry.delete(id);
   }
-  window.lstack.terminal.kill(id);
+  window.avnstack.terminal.kill(id);
 }
 
 // ─── Single terminal instance ─────────────────────────────────────────────────
@@ -57,7 +57,7 @@ export function TerminalInstance({ id, cwd, projectName }: Props) {
       mountRef.current.appendChild(existing.container);
       setTimeout(() => {
         existing.fitAddon.fit();
-        window.lstack.terminal.resize(id, existing.xterm.cols, existing.xterm.rows);
+        window.avnstack.terminal.resize(id, existing.xterm.cols, existing.xterm.rows);
       }, 50);
 
       return () => {
@@ -101,24 +101,24 @@ export function TerminalInstance({ id, cwd, projectName }: Props) {
 
     // Forward user input to PTY
     xterm.onData((data) => {
-      window.lstack.terminal.write(id, data);
+      window.avnstack.terminal.write(id, data);
     });
 
     // Receive PTY output
-    const unsubData = window.lstack.terminal.onData((termId: string, data: string) => {
+    const unsubData = window.avnstack.terminal.onData((termId: string, data: string) => {
       if (termId === id) xterm.write(data);
     });
 
     // Handle PTY exit — offer restart on any key
-    const unsubExit = window.lstack.terminal.onExit((termId: string) => {
+    const unsubExit = window.avnstack.terminal.onExit((termId: string) => {
       if (termId === id) {
         xterm.write('\r\n\x1b[2m[Process exited — press any key to restart]\x1b[0m');
         const disposable = xterm.onData(() => {
           disposable.dispose();
           xterm.reset();
-          window.lstack.terminal.create(id, cwd, projectName).then(() => {
+          window.avnstack.terminal.create(id, cwd, projectName).then(() => {
             fitAddon.fit();
-            window.lstack.terminal.resize(id, xterm.cols, xterm.rows);
+            window.avnstack.terminal.resize(id, xterm.cols, xterm.rows);
           });
         });
       }
@@ -127,8 +127,8 @@ export function TerminalInstance({ id, cwd, projectName }: Props) {
     // Start the PTY
     setTimeout(() => {
       fitAddon.fit();
-      window.lstack.terminal.create(id, cwd, projectName).then(() => {
-        window.lstack.terminal.resize(id, xterm.cols, xterm.rows);
+      window.avnstack.terminal.create(id, cwd, projectName).then(() => {
+        window.avnstack.terminal.resize(id, xterm.cols, xterm.rows);
       });
     }, 50);
 
@@ -136,7 +136,7 @@ export function TerminalInstance({ id, cwd, projectName }: Props) {
     const observer = new ResizeObserver(() => {
       requestAnimationFrame(() => {
         fitAddon.fit();
-        window.lstack.terminal.resize(id, xterm.cols, xterm.rows);
+        window.avnstack.terminal.resize(id, xterm.cols, xterm.rows);
       });
     });
     observer.observe(container);

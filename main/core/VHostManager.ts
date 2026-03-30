@@ -1,7 +1,7 @@
 import chokidar, { FSWatcher } from 'chokidar';
 import path from 'path';
 import fs from 'fs-extra';
-import type { LStackSettings, VHost, LogEntry, PhpProfile, PhpRuntimeStatus, VHostPhpSettings } from '../../src/types';
+import type { AVNStackSettings, VHost, LogEntry, PhpProfile, PhpRuntimeStatus, VHostPhpSettings } from '../../src/types';
 import type { CertManager } from './CertManager';
 import { PhpFpmManager } from './PhpFpmManager';
 import { PhpProfileManager } from './PhpProfileManager';
@@ -241,7 +241,7 @@ const APACHE_VHOST_SSL_TPL = `<VirtualHost *:<<HTTP_PORT>>>
 
 // ─── VHostManager ─────────────────────────────────────────────────────────────
 export class VHostManager {
-  private settings: LStackSettings;
+  private settings: AVNStackSettings;
   private resourcesDir: string;
   private onLog: (entry: LogEntry) => void;
   private onReloadWebserver?: () => void;
@@ -252,7 +252,7 @@ export class VHostManager {
   public phpProfileManager: PhpProfileManager;
 
   constructor(
-    settings: LStackSettings,
+    settings: AVNStackSettings,
     resourcesDir: string,
     onLog: (entry: LogEntry) => void,
     onReloadWebserver?: () => void,
@@ -604,7 +604,7 @@ export class VHostManager {
     this.watcher?.close();
   }
 
-  updateSettings(settings: LStackSettings): void {
+  updateSettings(settings: AVNStackSettings): void {
     this.settings = settings;
     this.phpFpmManager.updateSettings(settings);
     this.phpProfileManager.updateSettings(settings);
@@ -691,7 +691,7 @@ export class VHostManager {
 
   private log(level: LogEntry['level'], message: string): void {
     this.onLog({
-      service: 'lstack',
+      service: 'avnstack',
       level,
       message,
       timestamp: new Date().toISOString(),
@@ -760,8 +760,8 @@ export class VHostManager {
       }
     }
 
-    const certFile = this.certManager ? this.certManager.getCertPath() : path.join(sslDir, 'lstack.crt');
-    const keyFile = this.certManager ? this.certManager.getKeyPath() : path.join(sslDir, 'lstack.key');
+    const certFile = this.certManager ? this.certManager.getCertPath() : path.join(sslDir, 'avnstack.crt');
+    const keyFile = this.certManager ? this.certManager.getKeyPath() : path.join(sslDir, 'avnstack.key');
     const hasSSL = await fs.pathExists(certFile) && await fs.pathExists(keyFile);
 
     const vhost: VHost = {
@@ -786,8 +786,8 @@ export class VHostManager {
           vhost.phpProfileId = match.phpProfileId;
           vhost.phpSettings = match.phpSettings;
           vhost.cgiPort = match.cgiPort;
-          // Resolve saved projectDir (with .devstack → .lstack migration)
-          const savedDir = (match.projectDir || '').replace(/\.devstack/g, '.lstack');
+          // Resolve saved projectDir (with .devstack/.lstack → .avnstack migration)
+          const savedDir = (match.projectDir || '').replace(/\.devstack/g, '.avnstack').replace(/\.lstack/g, '.avnstack');
           const savedPublic = savedDir ? path.join(savedDir, 'public') : '';
           if (!vhost.projectDir.endsWith(`${path.sep}public`) && !vhost.projectDir.endsWith('/public')) {
             if (savedDir && await fs.pathExists(savedDir)) {
@@ -1051,8 +1051,8 @@ export class VHostManager {
     sslDir: string,
     _logsDir: string,
   ): Promise<void> {
-    let certFile = this.certManager ? this.certManager.getCertPath() : path.join(sslDir, 'lstack.crt');
-    let keyFile = this.certManager ? this.certManager.getKeyPath() : path.join(sslDir, 'lstack.key');
+    let certFile = this.certManager ? this.certManager.getCertPath() : path.join(sslDir, 'avnstack.crt');
+    let keyFile = this.certManager ? this.certManager.getKeyPath() : path.join(sslDir, 'avnstack.key');
     let hasSSL = false;
 
     const phpValues = this.buildPhpValues(vhost.phpSettings);
@@ -1101,8 +1101,8 @@ export class VHostManager {
     sslDir: string,
     logsDir: string,
   ): Promise<void> {
-    let certFile = this.certManager ? this.certManager.getCertPath() : path.join(sslDir, 'lstack.crt');
-    let keyFile = this.certManager ? this.certManager.getKeyPath() : path.join(sslDir, 'lstack.key');
+    let certFile = this.certManager ? this.certManager.getCertPath() : path.join(sslDir, 'avnstack.crt');
+    let keyFile = this.certManager ? this.certManager.getKeyPath() : path.join(sslDir, 'avnstack.key');
     let hasSSL = false;
 
     const cgiPort = vhost.cgiPort || 9099;
@@ -1200,6 +1200,7 @@ export class VHostManager {
 }
 
 // ─── Hosts File Editor ────────────────────────────────────────────────────────
+// ─── Hosts File Editor ────────────────────────────────────────────────────────
 class HostsEditor {
   private static hostsPath =
     process.platform === 'win32'
@@ -1210,49 +1211,107 @@ class HostsEditor {
     const content = await fs.readFile(this.hostsPath, 'utf-8').catch(() => '');
     if (content.includes(hostname)) return;
 
-    const entry = `\n${ip}\t${hostname}\t# LStack`;
+    const entry = `${ip}\t${hostname}\t# AVN-Stack\n`;
 
     try {
+      // Attempt direct write first (may succeed if run as admin/root)
       await fs.appendFile(this.hostsPath, entry);
       return;
     } catch { /* need elevation */ }
 
     if (process.platform === 'win32') {
-      const line = `${ip}\\t${hostname}\\t# LStack`;
+      const line = `${ip}\\t${hostname}\\t# AVN-Stack`;
       const cmd = `Add-Content -Path '${this.hostsPath}' -Value '${line}' -Encoding UTF8`;
-      await new Promise<void>((resolve, reject) => {
-        const { spawn } = require('child_process');
-        const proc = spawn(
-          'powershell',
-          ['-NoProfile', '-Command',
-            `Start-Process powershell -Verb RunAs -Wait -WindowStyle Hidden -ArgumentList "-NoProfile -Command \\"${cmd}\\""`],
-          { shell: false, windowsHide: true },
-        );
-        proc.on('exit', (code: number) => code === 0 ? resolve() : reject(new Error(`Exit ${code}`)));
-        proc.on('error', reject);
-      });
+      await this.runElevatedWin(cmd);
       return;
     }
 
-    await new Promise<void>((resolve, reject) => {
-      const { spawn } = require('child_process');
-      const proc = spawn(
-        'sudo', ['tee', '-a', this.hostsPath],
-        { stdio: ['pipe', 'ignore', 'ignore'] },
-      );
-      proc.stdin.write(entry);
-      proc.stdin.end();
-      proc.on('exit', (code: number) => code === 0 ? resolve() : reject(new Error(`Exit ${code}`)));
-      proc.on('error', reject);
-    });
+    if (process.platform === 'darwin') {
+      const cmd = `echo "${entry.trim()}" >> ${this.hostsPath}`;
+      await this.runElevatedMac(cmd);
+      return;
+    }
+
+    // Linux
+    const cmd = `echo "${entry.trim()}" | tee -a ${this.hostsPath}`;
+    await this.runElevatedLinux(cmd);
   }
 
   static async remove(hostname: string): Promise<void> {
     try {
       const content = await fs.readFile(this.hostsPath, 'utf-8');
       const lines = content.split('\n').filter((line) => !line.includes(hostname));
-      await fs.writeFile(this.hostsPath, lines.join('\n'));
-    } catch { /* ignore */ }
+      const newContent = lines.join('\n');
+
+      try {
+        await fs.writeFile(this.hostsPath, newContent);
+        return;
+      } catch { /* need elevation */ }
+
+      if (process.platform === 'win32') {
+        const escapedContent = newContent.replace(/'/g, "''");
+        const cmd = `Set-Content -Path '${this.hostsPath}' -Value '${escapedContent}' -Encoding UTF8`;
+        await this.runElevatedWin(cmd);
+      } else if (process.platform === 'darwin') {
+        const tmpFile = `/tmp/avnstack_hosts_${Date.now()}`;
+        await fs.writeFile(tmpFile, newContent);
+        await this.runElevatedMac(`cp ${tmpFile} ${this.hostsPath} && rm ${tmpFile}`);
+      } else {
+        const tmpFile = `/tmp/avnstack_hosts_${Date.now()}`;
+        await fs.writeFile(tmpFile, newContent);
+        await this.runElevatedLinux(`cp ${tmpFile} ${this.hostsPath} && rm ${tmpFile}`);
+      }
+    } catch (err) {
+      console.error('Failed to remove hosts entry:', err);
+    }
+  }
+
+  private static runElevatedWin(cmd: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const { spawn } = require('child_process');
+      const proc = spawn(
+        'powershell',
+        ['-NoProfile', '-Command',
+          `Start-Process powershell -Verb RunAs -Wait -WindowStyle Hidden -ArgumentList "-NoProfile -Command \\"${cmd}\\""`],
+        { shell: false, windowsHide: true },
+      );
+      proc.on('exit', (code: number) => code === 0 ? resolve() : reject(new Error(`Exit ${code}`)));
+      proc.on('error', reject);
+    });
+  }
+
+  private static runElevatedMac(cmd: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const { spawn } = require('child_process');
+      const escapedCmd = cmd.replace(/"/g, '\\"');
+      const proc = spawn(
+        'osascript',
+        ['-e', `do shell script "${escapedCmd}" with administrator privileges`],
+      );
+      proc.on('exit', (code: number) => code === 0 ? resolve() : reject(new Error(`Exit ${code}`)));
+      proc.on('error', reject);
+    });
+  }
+
+  private static runElevatedLinux(cmd: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const { spawn } = require('child_process');
+      // Try pkexec first for GUI prompt, fallback to sudo
+      const proc = spawn('pkexec', ['sh', '-c', cmd]);
+      proc.on('exit', (code: number) => {
+        if (code === 0) resolve();
+        else {
+          const sudoProc = spawn('sudo', ['sh', '-c', cmd]);
+          sudoProc.on('exit', (sudoCode: number) => sudoCode === 0 ? resolve() : reject(new Error(`Exit ${sudoCode}`)));
+          sudoProc.on('error', reject);
+        }
+      });
+      proc.on('error', () => {
+        const sudoProc = spawn('sudo', ['sh', '-c', cmd]);
+        sudoProc.on('exit', (sudoCode: number) => sudoCode === 0 ? resolve() : reject(new Error(`Exit ${sudoCode}`)));
+        sudoProc.on('error', reject);
+      });
+    });
   }
 }
 

@@ -11,18 +11,18 @@ export function AboutModal() {
 
   useEffect(() => {
     if (showAboutModal) {
-      window.lstack.system.getAppInfo().then(setAppInfo).catch(() => {});
+      window.avnstack.system.getAppInfo().then(setAppInfo).catch(() => {});
     }
   }, [showAboutModal]);
 
   if (!showAboutModal) return null;
 
   const info = {
-    name: appInfo?.name || 'LStack',
+    name: appInfo?.name || 'AVN-Stack',
     owner: appInfo?.owner || 'marixdev',
     version: appInfo?.version || '-',
-    homepage: appInfo?.homepage || 'https://lstack.dev',
-    repositoryUrl: appInfo?.repositoryUrl || 'https://github.com/marixdev/lstack',
+    homepage: appInfo?.homepage || 'https://avn.io.vn',
+    repositoryUrl: '',
   };
 
   return (
@@ -49,7 +49,7 @@ export function AboutModal() {
         <div className="px-5 py-4 space-y-4">
           {/* Logo + name */}
           <div className="flex items-center gap-3">
-            <img src="./icon.png" alt="LStack" className="w-12 h-12 object-contain drop-shadow" />
+            <img src="./icon.png" alt="AVN-Stack" className="w-12 h-12 object-contain drop-shadow" />
             <div>
               <div className="text-lg font-bold text-slate-100">{info.name}</div>
               <div className="text-xs text-slate-400">v{info.version}</div>
@@ -66,14 +66,14 @@ export function AboutModal() {
           {/* Action buttons */}
           <div className="flex flex-wrap gap-2 pt-1">
             <button
-              onClick={() => window.lstack.system.openBrowser(info.homepage)}
+              onClick={() => window.avnstack.system.openBrowser(info.homepage)}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg transition-colors"
             >
               <ExternalLink size={12} />
               {t('settings.about.openWebsite')}
             </button>
             <button
-              onClick={() => window.lstack.system.openBrowser(info.repositoryUrl)}
+              onClick={() => window.avnstack.system.openBrowser(info.repositoryUrl)}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg transition-colors"
             >
               <ExternalLink size={12} />

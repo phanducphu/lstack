@@ -1,8 +1,8 @@
-// Type augmentation for window.lstack API exposed via preload
-import type { LStackAPI } from '../../main/preload';
+// Type augmentation for window.avnstack API exposed via preload
+import type { AVNStackAPI } from '../../main/preload';
 
 declare global {
   interface Window {
-    lstack: LStackAPI;
+    avnstack: AVNStackAPI;
   }
 }

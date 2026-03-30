@@ -3,7 +3,7 @@
  * Manages CA installation, domain cert generation, and trust providers
  * for Windows/macOS/Linux (including Chromium NSS and Firefox NSS).
  *
- * Certs stored in: .lstack/etc/ssl/
+ * Certs stored in: .avnstack/etc/ssl/
  */
 
 import path from 'path';
@@ -17,7 +17,7 @@ const execFileAsync = promisify(execFile);
 
 // ── SSL Trust Provider interfaces & helpers ──────────────────────────
 
-const CA_LABEL = 'LStack Local CA';
+const CA_LABEL = 'AVN-Stack Local CA';
 
 interface SslProviderStatus {
   id: string;
@@ -360,7 +360,7 @@ class ChromiumNSS implements SslProvider {
         if (!stdout.includes(CA_LABEL)) {
           return {
             id: this.id, label: this.label, supported: true, ready: false,
-            state: 'missing', message: 'Chromium chưa trust CA của LStack.',
+            state: 'missing', message: 'Chromium chưa trust CA của AVN-Stack.',
             warnings: [`NSS DB chưa trust: ${dbPath}`],
             meta: { dbCount: dbPaths.length, certutilReady: true },
           };
@@ -443,7 +443,7 @@ class FirefoxNSS implements SslProvider {
         if (!stdout.includes(CA_LABEL)) {
           return {
             id: this.id, label: this.label, supported: true, ready: false,
-            state: 'missing', message: 'Firefox chưa trust CA của LStack.',
+            state: 'missing', message: 'Firefox chưa trust CA của AVN-Stack.',
             warnings: [`Profile chưa trust: ${profile}`],
             meta: { profiles: profiles.length, certutilReady: true },
           };
@@ -519,8 +519,8 @@ export class CertManager {
   constructor(sslDir: string) {
     this.sslDir = sslDir;
     this.mkcertBin = path.join(sslDir, process.platform === 'win32' ? 'mkcert.exe' : 'mkcert');
-    this.certFile = path.join(sslDir, 'lstack.crt');
-    this.keyFile = path.join(sslDir, 'lstack.key');
+    this.certFile = path.join(sslDir, 'avnstack.crt');
+    this.keyFile = path.join(sslDir, 'avnstack.key');
   }
 
   /** Auto-generate default cert if mkcert is ready but cert is missing */
@@ -685,7 +685,7 @@ export class CertManager {
       timeout: 120_000,
       maxRedirects: 10,
       headers: {
-        'User-Agent': 'Mozilla/5.0 LStack/0.1.0',
+        'User-Agent': 'Mozilla/5.0 AVN-Stack/0.1.0',
         Accept: '*/*',
       },
     });

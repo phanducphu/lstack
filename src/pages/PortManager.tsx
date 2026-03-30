@@ -22,7 +22,7 @@ export function PortManager() {
     if (portNumber < 1 || portNumber > 65535) return;
     setSearching(true);
     try {
-      const procs = await window.lstack.service.getProcessesOnPort(portNumber);
+      const procs = await window.avnstack.service.getProcessesOnPort(portNumber);
       setResults((prev) => {
         const existing = new Set(prev.map((p) => `${p.pid}:${p.port}`));
         const merged = [...prev];
@@ -51,7 +51,7 @@ export function PortManager() {
     setResults([]);
     try {
       for (const p of QUICK_PORTS) {
-        const procs = await window.lstack.service.getProcessesOnPort(p);
+        const procs = await window.avnstack.service.getProcessesOnPort(p);
         if (procs.length > 0) {
           setResults((prev) => {
             const existing = new Set(prev.map((r) => `${r.pid}:${r.port}`));
@@ -72,7 +72,7 @@ export function PortManager() {
   const handleKill = async (pid: string) => {
     if (!confirm(t('portManager.killConfirm', { pid }))) return;
     try {
-      await window.lstack.service.killProcess(pid);
+      await window.avnstack.service.killProcess(pid);
       setResults((prev) => prev.filter((p) => p.pid !== pid));
       addToast({ type: 'success', message: t('portManager.killSuccess', { pid: String(pid) }) });
     } catch {

@@ -16,12 +16,12 @@ import { VHostManager } from './core/VHostManager';
 import { CertManager } from './core/CertManager';
 import { registerIpcHandlers } from './ipc';
 import { TerminalManager } from './core/TerminalManager';
-import type { LStackSettings } from '../src/types';
+import type { AVNStackSettings } from '../src/types';
 
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 
 const HOME = app.getPath('home');
-const DATA_DIR = path.join(HOME, '.lstack');
+const DATA_DIR = path.join(HOME, '.avnstack');
 const ELECTRON_USER_DATA_DIR = path.join(DATA_DIR, 'electron');
 const ELECTRON_SESSION_DATA_DIR = path.join(ELECTRON_USER_DATA_DIR, 'session');
 const ELECTRON_CACHE_DIR = path.join(ELECTRON_USER_DATA_DIR, 'cache');
@@ -51,7 +51,7 @@ if (!gotSingleInstanceLock) {
   app.quit();
 }
 
-const defaultSettings: LStackSettings = {
+const defaultSettings: AVNStackSettings = {
   wwwDir: WWW_DIR,
   dataDir: DATA_DIR,
   logsDir: LOGS_DIR,
@@ -129,7 +129,7 @@ const VERSION_NORMALIZERS: Record<string, Record<string, string>> = {
   },
 };
 
-function normalizeSettingsVersions(s: LStackSettings): LStackSettings {
+function normalizeSettingsVersions(s: AVNStackSettings): AVNStackSettings {
   const next = { ...s } as Record<string, unknown>;
   for (const [key, aliases] of Object.entries(VERSION_NORMALIZERS)) {
     const current = next[key];
@@ -137,13 +137,13 @@ function normalizeSettingsVersions(s: LStackSettings): LStackSettings {
       next[key] = aliases[current];
     }
   }
-  return next as unknown as LStackSettings;
+  return next as unknown as AVNStackSettings;
 }
 
 // ─── Globals ──────────────────────────────────────────────────────────────────
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
-let settings: LStackSettings = defaultSettings;
+let settings: AVNStackSettings = defaultSettings;
 let serviceManager: ServiceManager;
 let packageManager: PackageManager;
 let vhostManager: VHostManager;
@@ -152,6 +152,16 @@ let isQuitting = false;
 
 // ─── Init Data Directories ────────────────────────────────────────────────────
 async function initDataDirs() {
+  // Rebranding migration: Move .lstack to .avnstack if it exists
+  const OLD_DATA_DIR = path.join(HOME, '.lstack');
+  if (fs.existsSync(OLD_DATA_DIR) && !fs.existsSync(DATA_DIR)) {
+    try {
+      fs.moveSync(OLD_DATA_DIR, DATA_DIR);
+    } catch (err) {
+      console.error('Failed to migrate data directory:', err);
+    }
+  }
+
   await fs.ensureDir(DATA_DIR);
   await fs.ensureDir(BIN_DIR);
   await fs.ensureDir(WWW_DIR);
@@ -163,7 +173,7 @@ async function initDataDirs() {
   await fs.ensureDir(LOGS_DIR);
   await fs.ensureDir(DB_DIR);
 
-  // Create default www/index.php — LStack dashboard
+  // Create default www/index.php — AVN-Stack dashboard
   const indexFile = path.join(WWW_DIR, 'index.php');
   if (!await fs.pathExists(indexFile)) {
     await fs.writeFile(indexFile, LOCALHOST_HOMEPAGE);
@@ -171,23 +181,23 @@ async function initDataDirs() {
 }
 
 // ─── Load / Save Settings ─────────────────────────────────────────────────────
-async function loadSettings(): Promise<LStackSettings> {
+async function loadSettings(): Promise<AVNStackSettings> {
   try {
     if (await fs.pathExists(SETTINGS_FILE)) {
       const saved = await fs.readJson(SETTINGS_FILE);
-      const merged: LStackSettings = { ...defaultSettings, ...saved };
-      // Migrate .devstack → .lstack paths
-      if (merged.dataDir && merged.dataDir.includes('.devstack')) {
-        merged.dataDir = merged.dataDir.replace('.devstack', '.lstack');
+      const merged: AVNStackSettings = { ...defaultSettings, ...saved };
+      // Migrate .devstack/.lstack → .avnstack paths
+      if (merged.dataDir && (merged.dataDir.includes('.devstack') || merged.dataDir.includes('.lstack'))) {
+        merged.dataDir = merged.dataDir.replace('.devstack', '.avnstack').replace('.lstack', '.avnstack');
       }
-      if (merged.wwwDir && merged.wwwDir.includes('.devstack')) {
-        merged.wwwDir = merged.wwwDir.replace('.devstack', '.lstack');
+      if (merged.wwwDir && (merged.wwwDir.includes('.devstack') || merged.wwwDir.includes('.lstack'))) {
+        merged.wwwDir = merged.wwwDir.replace('.devstack', '.avnstack').replace('.lstack', '.avnstack');
       }
-      if (merged.logsDir && merged.logsDir.includes('.devstack')) {
-        merged.logsDir = merged.logsDir.replace('.devstack', '.lstack');
+      if (merged.logsDir && (merged.logsDir.includes('.devstack') || merged.logsDir.includes('.lstack'))) {
+        merged.logsDir = merged.logsDir.replace('.devstack', '.avnstack').replace('.lstack', '.avnstack');
       }
-      if (merged.binDir && merged.binDir.includes('.devstack')) {
-        merged.binDir = merged.binDir.replace('.devstack', '.lstack');
+      if (merged.binDir && (merged.binDir.includes('.devstack') || merged.binDir.includes('.lstack'))) {
+        merged.binDir = merged.binDir.replace('.devstack', '.avnstack').replace('.lstack', '.avnstack');
       }
       return normalizeSettingsVersions(merged);
     }
@@ -197,7 +207,7 @@ async function loadSettings(): Promise<LStackSettings> {
   return normalizeSettingsVersions(defaultSettings);
 }
 
-async function saveSettings(s: LStackSettings) {
+async function saveSettings(s: AVNStackSettings) {
   await fs.ensureDir(DATA_DIR);
   await fs.writeJson(SETTINGS_FILE, s, { spaces: 2 });
 }
@@ -257,10 +267,10 @@ function createTray() {
       : nativeImage.createEmpty();
 
     tray = new Tray(icon);
-    tray.setToolTip('LStack');
+    tray.setToolTip('AVN-Stack');
 
     const contextMenu = Menu.buildFromTemplate([
-      { label: 'Open LStack', click: () => mainWindow?.show() },
+      { label: 'Open AVN-Stack', click: () => mainWindow?.show() },
       { type: 'separator' },
       {
         label: 'Start All Services',
@@ -273,7 +283,7 @@ function createTray() {
       { type: 'separator' },
       { label: 'Open www folder', click: () => shell.openPath(settings.wwwDir) },
       { type: 'separator' },
-      { label: 'Quit LStack', click: () => { app.quit(); } },
+      { label: 'Quit AVN-Stack', click: () => { app.quit(); } },
     ]);
 
     tray.setContextMenu(contextMenu);
@@ -459,7 +469,7 @@ $pmaUrl = 'http://phpmyadmin.test' . ($port !== '80' ? ':' . $port : '');
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LStack — Local Development</title>
+<title>AVN-Stack — Local Development</title>
 <style>
 :root{--bg:#0f172a;--bg-soft:#111c33;--card:#1e293b;--card-soft:rgba(30,41,59,.72);--border:#334155;--border-strong:#475569;--text:#f1f5f9;--muted:#94a3b8;--blue:#60a5fa;--blue-strong:#2563eb;--green:#22c55e;--red:#ef4444;--shadow:0 20px 45px rgba(2,6,23,.45)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -527,7 +537,7 @@ body:before{content:'';position:fixed;inset:0;background:linear-gradient(180deg,
     <div class="hero-main">
       <div class="logo">⚡</div>
       <div class="hero-copy">
-        <h1>LStack</h1>
+        <h1>AVN-Stack</h1>
         <p>Trang tổng quan local development cho PHP, database và tất cả project đang có trong thư mục www.</p>
       </div>
     </div>
@@ -598,7 +608,7 @@ body:before{content:'';position:fixed;inset:0;background:linear-gradient(180deg,
     <div class="empty">
       <div class="empty-icon">📁</div>
       <h3>Chưa có project nào</h3>
-      <p>Tạo project từ ứng dụng LStack hoặc thêm thư mục mới vào www để hệ thống tự nhận diện.</p>
+      <p>Tạo project từ ứng dụng AVN-Stack hoặc thêm thư mục mới vào www để hệ thống tự nhận diện.</p>
     </div>
     <?php else: ?>
     <div class="projects">

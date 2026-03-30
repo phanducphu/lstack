@@ -16,25 +16,25 @@ export function TitleBar() {
     const next = language === 'vi' ? 'en' : 'vi';
     const updated = { ...settings!, language: next as 'vi' | 'en' };
     setSettings(updated);
-    await window.lstack.settings.set(updated);
+    await window.avnstack.settings.set(updated);
   };
 
   const toggleTheme = async () => {
     const next = settings?.theme === 'light' ? 'dark' : 'light';
     const updated = { ...settings!, theme: next as 'dark' | 'light' };
     setSettings(updated);
-    await window.lstack.settings.set(updated);
+    await window.avnstack.settings.set(updated);
   };
 
   useEffect(() => {
-    window.lstack.system.getPlatform().then(setPlatform);
-    window.lstack.system.isMaximized().then(setIsMaximized);
+    window.avnstack.system.getPlatform().then(setPlatform);
+    window.avnstack.system.isMaximized().then(setIsMaximized);
   }, []);
 
   // Listen for maximize/unmaximize to update button state
   useEffect(() => {
     const interval = setInterval(async () => {
-      const maximized = await window.lstack.system.isMaximized();
+      const maximized = await window.avnstack.system.isMaximized();
       setIsMaximized(maximized);
     }, 1000);
     return () => clearInterval(interval);
@@ -68,8 +68,8 @@ export function TitleBar() {
         className="flex items-center gap-2 px-3 h-full border-r border-slate-700/60 shrink-0 hover:bg-slate-800/60 transition-colors"
         style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
       >
-        <img src="./icon.png" alt="LStack" className="w-5 h-5 object-contain drop-shadow" />
-        <span className="text-sm font-semibold text-slate-200">LStack</span>
+        <img src="./icon.png" alt="AVN-Stack" className="w-5 h-5 object-contain drop-shadow" />
+        <span className="text-sm font-semibold text-slate-200">AVN-Stack</span>
       </button>
 
       {/* Terminal tabs */}
@@ -139,21 +139,21 @@ export function TitleBar() {
           style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
         >
           <button
-            onClick={() => window.lstack.system.minimize()}
+            onClick={() => window.avnstack.system.minimize()}
             className="w-11 h-full flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 transition-colors"
             title={t('titlebar.minimize')}
           >
             <Minus size={13} />
           </button>
           <button
-            onClick={() => window.lstack.system.maximize()}
+            onClick={() => window.avnstack.system.maximize()}
             className="w-11 h-full flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 transition-colors"
             title={isMaximized ? t('titlebar.restore') : t('titlebar.maximize')}
           >
             {isMaximized ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
           </button>
           <button
-            onClick={() => window.lstack.system.closeWindow()}
+            onClick={() => window.avnstack.system.closeWindow()}
             className="w-11 h-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-red-600 transition-colors"
             title={t('titlebar.close')}
           >

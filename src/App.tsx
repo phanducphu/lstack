@@ -36,7 +36,7 @@ export default function App() {
     }, [settings?.theme]);
 
     useEffect(() => {
-      const api = window.lstack;
+      const api = window.avnstack;
 
       Promise.all([
         api.service.getStatuses(),

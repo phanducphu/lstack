@@ -1,6 +1,6 @@
 {
-  "appId": "dev.lstack.app",
-  "productName": "LStack",
+  "appId": "dev.avnstack.app",
+  "productName": "AVN-Stack",
   "directories": {
     "output": "release"
   },
@@ -32,7 +32,7 @@
     "category": "public.app-category.developer-tools"
   },
   "dmg": {
-    "title": "LStack",
+    "title": "AVN-Stack",
     "icon": "icon.png"
   },
   "linux": {
@@ -43,7 +43,7 @@
       "AppImage"
     ],
     "category": "Development",
-    "maintainer": "LStack <contact@lstack.dev>"
+    "maintainer": "AVN-Stack <contact@avnstack.dev>"
   },
   "npmRebuild": false,
   "buildDependenciesFromSource": false

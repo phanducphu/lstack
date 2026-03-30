@@ -5,7 +5,7 @@ import type {
   PackageCategory,
   Project,
   VHost,
-  LStackSettings,
+  AVNStackSettings,
   LogEntry,
   DownloadProgress,
 } from '../types';
@@ -16,7 +16,7 @@ interface ServiceStore {
   setServices: (s: ServiceInfo[]) => void;
   updateService: (name: ServiceName, patch: Partial<ServiceInfo>) => void;
   addLog: (entry: LogEntry) => void;
-  clearLogs: (service?: ServiceName | 'lstack') => void;
+  clearLogs: (service?: ServiceName | 'avnstack') => void;
 }
 
 interface PackageStore {
@@ -37,8 +37,8 @@ interface ProjectStore {
 }
 
 interface SettingsStore {
-  settings: LStackSettings | null;
-  setSettings: (s: LStackSettings) => void;
+  settings: AVNStackSettings | null;
+  setSettings: (s: AVNStackSettings) => void;
 }
 
 interface UIStore {
@@ -55,7 +55,7 @@ interface UIStore {
 }
 
 // Default settings
-const defaultSettings: LStackSettings = {
+const defaultSettings: AVNStackSettings = {
   wwwDir: '',
   dataDir: '',
   logsDir: '',

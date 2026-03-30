@@ -45,7 +45,7 @@ export function Packages() {
   };
 
   useEffect(() => {
-    const unsub = window.lstack.package.onProgress((progress: DownloadProgress) => {
+    const unsub = window.avnstack.package.onProgress((progress: DownloadProgress) => {
       setDownload(progress.packageId, progress);
     });
     return () => { unsub(); };
@@ -58,9 +58,9 @@ export function Packages() {
   const loadPackages = async () => {
     setLoading(true);
     try {
-      const list = await window.lstack.package.list();
+      const list = await window.avnstack.package.list();
       setCategories(list);
-      const installed = await window.lstack.package.getInstalled();
+      const installed = await window.avnstack.package.getInstalled();
       setInstalledVersions(installed);
     } finally {
       setLoading(false);
@@ -69,7 +69,7 @@ export function Packages() {
 
   const handleInstall = async (categoryId: string, version: string) => {
     try {
-      await window.lstack.package.install(categoryId, version);
+      await window.avnstack.package.install(categoryId, version);
       addToast({ type: 'success', message: t('packages.install.success', { category: categoryId, version }) });
       await loadPackages();
     } catch (err: unknown) {
@@ -81,7 +81,7 @@ export function Packages() {
   const handleUninstall = async (categoryId: string, version: string) => {
     if (!confirm(t('packages.uninstall.confirm', { category: categoryId, version }))) return;
     try {
-      await window.lstack.package.uninstall(categoryId, version);
+      await window.avnstack.package.uninstall(categoryId, version);
       addToast({ type: 'success', message: t('packages.uninstall.success', { category: categoryId, version }) });
       await loadPackages();
     } catch (err: unknown) {
@@ -92,7 +92,7 @@ export function Packages() {
 
   const handleSwitch = async (categoryId: string, version: string) => {
     try {
-      await window.lstack.package.switchVersion(categoryId, version);
+      await window.avnstack.package.switchVersion(categoryId, version);
       addToast({ type: 'success', message: t('packages.switch.success', { category: categoryId, version }) });
       await loadPackages();
     } catch (err: unknown) {
@@ -104,7 +104,7 @@ export function Packages() {
   const handleReconfigurePhp = async () => {
     setReconfiguring(true);
     try {
-      await window.lstack.package.reconfigurePhp();
+      await window.avnstack.package.reconfigurePhp();
       addToast({ type: 'success', message: t('packages.reconfigure.success') });
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);

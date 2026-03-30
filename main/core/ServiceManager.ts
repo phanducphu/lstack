@@ -2,21 +2,21 @@ import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
 import fs from 'fs-extra';
 import net from 'net';
-import type { ServiceInfo, ServiceName, ServiceStatus, LStackSettings, LogEntry } from '../../src/types';
+import type { ServiceInfo, ServiceName, ServiceStatus, AVNStackSettings, LogEntry } from '../../src/types';
 
 export interface ServiceConfig {
   name: ServiceName;
   label: string;
   getBinary: (binDir: string, version: string) => string;
-  getArgs: (settings: LStackSettings, etcDir: string) => string[];
-  getEnv?: (settings: LStackSettings) => NodeJS.ProcessEnv;
-  cwd?: (settings: LStackSettings) => string;
-  port: (settings: LStackSettings) => number;
-  version: (settings: LStackSettings) => string;
+  getArgs: (settings: AVNStackSettings, etcDir: string) => string[];
+  getEnv?: (settings: AVNStackSettings) => NodeJS.ProcessEnv;
+  cwd?: (settings: AVNStackSettings) => string;
+  port: (settings: AVNStackSettings) => number;
+  version: (settings: AVNStackSettings) => string;
   stopSignal?: NodeJS.Signals;
 }
 
-const ETC_DIR = (s: LStackSettings) => path.join(s.dataDir, 'etc');
+const ETC_DIR = (s: AVNStackSettings) => path.join(s.dataDir, 'etc');
 
 // Platform binary extension
 const EXE = process.platform === 'win32' ? '.exe' : '';
@@ -207,11 +207,11 @@ const SERVICE_CONFIGS: Record<ServiceName, ServiceConfig> = {
 export class ServiceManager {
   private processes: Map<ServiceName, ChildProcess> = new Map();
   private statuses: Map<ServiceName, ServiceInfo> = new Map();
-  private settings: LStackSettings;
+  private settings: AVNStackSettings;
   private onLog: (entry: LogEntry) => void;
 
   constructor(
-    settings: LStackSettings,
+    settings: AVNStackSettings,
     onLog: (entry: LogEntry) => void,
   ) {
     this.settings = settings;
@@ -861,7 +861,7 @@ ProxyFCGISetEnvIf "true" SCRIPT_FILENAME "%{DOCUMENT_ROOT}%{reqenv:SCRIPT_NAME}"
     await this.killOrphanedWindowsProcesses().catch(() => {});
   }
 
-  updateSettings(settings: LStackSettings) {
+  updateSettings(settings: AVNStackSettings) {
     this.settings = settings;
     for (const [name, cfg] of Object.entries(SERVICE_CONFIGS)) {
       const info = this.statuses.get(name as ServiceName);
@@ -1251,7 +1251,7 @@ ProxyFCGISetEnvIf "true" SCRIPT_FILENAME "%{DOCUMENT_ROOT}%{reqenv:SCRIPT_NAME}"
       this.log('mariadb', 'info', 'MariaDB admin credentials applied. phpMyAdmin should now connect correctly.');
     } else {
       this.log('mariadb', 'warn',
-        'Could not auto-apply credentials. To reset: stop MariaDB → delete ~/.lstack/data/mariadb → start MariaDB again.');
+        'Could not auto-apply credentials. To reset: stop MariaDB → delete ~/.avnstack/data/mariadb → start MariaDB again.');
     }
   }
 
