@@ -249,7 +249,7 @@ function createWindow() {
   mainWindow.on('close', (e) => {
     if (!isQuitting) {
       e.preventDefault();
-      app.quit();
+      mainWindow?.hide();
     }
   });
 
@@ -270,7 +270,13 @@ function createTray() {
     tray.setToolTip('AVN-Stack');
 
     const contextMenu = Menu.buildFromTemplate([
-      { label: 'Open AVN-Stack', click: () => mainWindow?.show() },
+      {
+        label: 'Open AVN-Stack',
+        click: () => {
+          mainWindow?.show();
+          mainWindow?.focus();
+        },
+      },
       { type: 'separator' },
       {
         label: 'Start All Services',
@@ -287,7 +293,10 @@ function createTray() {
     ]);
 
     tray.setContextMenu(contextMenu);
-    tray.on('double-click', () => mainWindow?.show());
+    tray.on('double-click', () => {
+      mainWindow?.show();
+      mainWindow?.focus();
+    });
   } catch (err) {
     console.log('Failed to create tray (might be unsupported on this Linux DE):', err);
   }
@@ -403,7 +412,12 @@ app.whenReady().then(async () => {
   }
 
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    } else {
+      mainWindow?.show();
+      mainWindow?.focus();
+    }
   });
 });
 
