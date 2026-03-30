@@ -761,7 +761,7 @@ export function registerIpcHandlers(ctx: IpcContext) {
   ipcMain.handle('system:getAppInfo', () => ({
     name: app.getName(),
     version: app.getVersion(),
-    owner: 'marixdev',
+    owner: 'phanducphu',
     homepage: 'https://avn.io.vn',
     repositoryUrl: '',
   }));

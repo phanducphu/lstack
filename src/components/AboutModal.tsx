@@ -19,7 +19,7 @@ export function AboutModal() {
 
   const info = {
     name: appInfo?.name || 'AVN-Stack',
-    owner: appInfo?.owner || 'marixdev',
+    owner: appInfo?.owner || 'phanducphu',
     version: appInfo?.version || '-',
     homepage: appInfo?.homepage || 'https://avn.io.vn',
     repositoryUrl: '',

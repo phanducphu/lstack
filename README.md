@@ -73,7 +73,7 @@ AVN-Stack stores all configuration, service binaries, and databases in a self-co
 - **Git**
 
 ### Steps
-1. Clone the repository: `git clone https://github.com/marixdev/avnstack.git`
+1. Clone the repository: `git clone https://github.com/phanducphu/AVN-Stack.git`
 2. Install dependencies: `npm install`
 3. Run development mode: `npm run dev`
 4. Build for your platform:
