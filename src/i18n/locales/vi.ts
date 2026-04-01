@@ -190,6 +190,8 @@ export const vi = {
   'phpProfiles.save.error': 'Lưu PHP profile thất bại: {message}',
   'phpProfiles.delete.success': 'Đã xóa PHP profile',
   'phpProfiles.delete.error': 'Xóa PHP profile thất bại: {message}',
+  'phpProfiles.resetDefault': 'Khôi phục mặc định',
+  'phpProfiles.save.reset': 'Đã khôi phục cài đặt gốc cho profile',
 
   // ── Port Manager ───────────────────────────────────────────────────────────
   'portManager.title': 'Quản lý cổng',

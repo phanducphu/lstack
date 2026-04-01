@@ -521,13 +521,12 @@ export class VHostManager {
         hostname: currentVhost?.hostname || `${name}.${this.settings.domain}`,
         projectDir: currentVhost?.projectDir || path.join(this.settings.wwwDir, name),
         phpProfileId: profileId,
-        phpVersion: profile.phpVersion,
         cgiPort: currentVhost?.cgiPort || 9099,
       });
       idx = vhosts.length - 1;
     } else {
       vhosts[idx].phpProfileId = profileId;
-      vhosts[idx].phpVersion = profile.phpVersion;
+      delete vhosts[idx].phpVersion; // Follow profile version
       delete vhosts[idx].phpSettings;
       vhosts[idx].hostname = vhosts[idx].hostname || `${name}.${this.settings.domain}`;
       vhosts[idx].projectDir = vhosts[idx].projectDir || path.join(this.settings.wwwDir, name);
@@ -834,7 +833,7 @@ export class VHostManager {
       name: vhost.name,
       hostname: vhost.hostname,
       projectDir: vhost.projectDir,
-      phpVersion: vhost.phpVersion,
+      phpVersion: vhostsData[existingIdx]?.phpVersion || undefined, // Keep existing override if present
       phpProfileId: vhost.phpProfileId,
       phpSettings: vhost.phpSettings,
       cgiPort: vhost.cgiPort,

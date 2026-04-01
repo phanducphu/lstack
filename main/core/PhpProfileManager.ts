@@ -145,10 +145,10 @@ export class PhpProfileManager {
     let changed = false;
 
     const profiles = raw.map((p) => {
-      const profile: PhpProfile = { ...p, isBuiltIn: false };
-      if (!profile.id || !allIds.has(profile.id) === false) {
-        // ID collision, regenerate
-      }
+      const profile: PhpProfile = { ...p };
+      // If it's not explicitly marked as built-in, it's a custom one.
+      // But overrides of built-in profiles will have isBuiltIn set by the update() method.
+      if (profile.isBuiltIn === undefined) profile.isBuiltIn = false;
       if (!profile.id || allIds.has(profile.id)) {
         profile.id = this.generateUniqueId(profile.name || 'profile', allIds);
         profile.updatedAt = new Date().toISOString();
@@ -167,12 +167,19 @@ export class PhpProfileManager {
 
   async list(): Promise<PhpProfile[]> {
     const custom = await this.readCustomProfiles();
+    const customIds = new Set(custom.map((p) => p.id));
+    const builtInIds = new Set(BUILT_IN_PROFILES.map((p) => p.id));
+
     return [
-      ...BUILT_IN_PROFILES.map((p) => ({
+      ...BUILT_IN_PROFILES.filter((p) => !customIds.has(p.id)).map((p) => ({
         ...p,
         phpVersion: p.phpVersion || this.settings.phpVersion,
       })),
-      ...custom,
+      ...custom.map((p) => ({
+        ...p,
+        isBuiltIn: p.isBuiltIn || builtInIds.has(p.id),
+        canReset: builtInIds.has(p.id),
+      })),
     ];
   }
 
@@ -203,16 +210,30 @@ export class PhpProfileManager {
 
   async update(id: string, patch: Partial<PhpProfile>): Promise<PhpProfile> {
     const custom = await this.readCustomProfiles();
-    const idx = custom.findIndex((p) => p.id === id);
-    if (idx === -1) throw new Error(`Custom PHP profile not found: ${id}`);
+    let idx = custom.findIndex((p) => p.id === id);
 
-    custom[idx] = {
-      ...custom[idx],
-      ...patch,
-      id: custom[idx].id, // preserve original id
-      isBuiltIn: false,
-      updatedAt: new Date().toISOString(),
-    };
+    if (idx === -1) {
+      // It might be a built-in profile we are editing for the first time
+      const builtIn = BUILT_IN_PROFILES.find((p) => p.id === id);
+      if (!builtIn) throw new Error(`PHP profile not found: ${id}`);
+
+      const newProfile: PhpProfile = {
+        ...builtIn,
+        ...patch,
+        id,
+        isBuiltIn: false, // Save as custom override, list() will re-add isBuiltIn tag
+        updatedAt: new Date().toISOString(),
+      };
+      custom.push(newProfile);
+      idx = custom.length - 1;
+    } else {
+      custom[idx] = {
+        ...custom[idx],
+        ...patch,
+        id: custom[idx].id, // preserve original id
+        updatedAt: new Date().toISOString(),
+      };
+    }
 
     await fs.writeJson(this.profilesFile, custom, { spaces: 2 });
     return custom[idx];

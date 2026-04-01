@@ -126,7 +126,7 @@ export function PhpProfiles() {
         name: editName.trim(),
         description: editDescription.trim(),
         phpVersion: editPhpVersion,
-        isBuiltIn: false,
+        isBuiltIn: selectedProfile?.isBuiltIn ?? false,
         phpSettings: editSettings,
         phpExtensions: editExtensions
           .split(',')
@@ -134,7 +134,7 @@ export function PhpProfiles() {
           .filter(Boolean),
       };
 
-      if (selectedId && selectedId !== '__new__' && !selectedProfile?.isBuiltIn) {
+      if (selectedId && selectedId !== '__new__') {
         await window.avnstack.phpProfile.update(selectedId, payload);
         addToast({ type: 'success', message: t('phpProfiles.save.updated') });
       } else {
@@ -154,10 +154,14 @@ export function PhpProfiles() {
 
   // ─── Delete ───────────────────────────────────────────────────────────────
   const handleDelete = async () => {
-    if (!selectedId || selectedId === '__new__' || selectedProfile?.isBuiltIn) return;
+    if (!selectedId || selectedId === '__new__') return;
+    if (selectedProfile?.isBuiltIn && !selectedProfile?.canReset) return;
     try {
       await window.avnstack.phpProfile.delete(selectedId);
-      addToast({ type: 'success', message: t('phpProfiles.delete.success') });
+      addToast({
+        type: 'success',
+        message: selectedProfile?.canReset ? t('phpProfiles.save.reset') : t('phpProfiles.delete.success'),
+      });
       setSelectedId(null);
       await loadProfiles();
     } catch (err: any) {
@@ -372,18 +376,16 @@ export function PhpProfiles() {
                   <Save size={14} />
                   {saving
                     ? t('common.saving')
-                    : selectedProfile?.isBuiltIn
-                      ? t('phpProfiles.saveAsCustom')
-                      : t('phpProfiles.saveProfile')}
+                    : t('phpProfiles.saveProfile')}
                 </button>
 
-                {selectedId && selectedId !== '__new__' && !selectedProfile?.isBuiltIn && (
+                {selectedId && selectedId !== '__new__' && (!selectedProfile?.isBuiltIn || selectedProfile?.canReset) && (
                   <button
                     onClick={handleDelete}
                     className="flex items-center gap-1.5 px-4 py-2 bg-slate-800 hover:bg-red-500/10 hover:text-red-400 text-slate-400 text-sm rounded-md border border-slate-700 hover:border-red-500/30 transition-colors"
                   >
                     <Trash2 size={14} />
-                    {t('phpProfiles.delete')}
+                    {selectedProfile?.canReset ? t('phpProfiles.resetDefault') : t('phpProfiles.delete')}
                   </button>
                 )}
               </div>

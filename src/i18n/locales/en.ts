@@ -192,6 +192,8 @@ export const en: Record<TranslationKey, string> = {
   'phpProfiles.save.error': 'Failed to save PHP profile: {message}',
   'phpProfiles.delete.success': 'Deleted PHP profile',
   'phpProfiles.delete.error': 'Failed to delete PHP profile: {message}',
+  'phpProfiles.resetDefault': 'Reset to Default',
+  'phpProfiles.save.reset': 'Profile has been reset to factory defaults',
 
   // ── Port Manager ───────────────────────────────────────────────────────────
   'portManager.title': 'Port Manager',

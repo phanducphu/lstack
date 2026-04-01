@@ -75,6 +75,7 @@ export interface PhpProfile {
   phpExtensions: string[]; // array of extension names like "pdo_mysql", "redis"
   createdAt?: string;
   updatedAt?: string;
+  canReset?: boolean;
 }
 
 export interface PhpRuntimeStatus {
